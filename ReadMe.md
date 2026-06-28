@@ -1,101 +1,93 @@
-# AWS AMI Resources
+# AWS Marketplace Resources
 
-Welcome to the AWS AMI Resources repository! This repository contains essential resources, scripts, and templates to help you get the most out of our AWS Marketplace AMIs.
+Supplementary resources, guides, scripts, and templates for our **AWS Marketplace
+products**. These materials help subscribers deploy and operate our offerings in
+their own AWS accounts.
 
-## Overview
+The repository covers two delivery types:
 
-This repository serves as a centralized hub for all supplementary materials related to our AWS Marketplace AMI offerings. Here you'll find CloudFormation templates, installation scripts, and documentation to help you quickly deploy and configure our solutions in your AWS environment.
-
-## Repository Structure
-
-```
-aws-ami-resources/
-├── prometheus-grafana/          # Resources for Prometheus & Grafana AMI
-│   ├── cloudformation/         # CloudFormation templates
-│   └── scripts/               # Installation and setup scripts
-└── [future-ami-resources]/    # Additional AMI resources (as we expand)
-```
-
-## Available AMI Resources
-
-### 1. Prometheus & Grafana Monitoring Solution
-
-A pre-configured monitoring stack for AWS environments that provides:
-- Automated EC2 instance discovery and monitoring
-- Pre-built Grafana dashboards
-- CloudFormation templates for IAM setup
-- Node Exporter installation scripts
-
-For detailed instructions, see [prometheus-grafana/README.md](prometheus-grafana/README.md).
-
-### 2. [Future AMI Name] (Coming Soon)
-
-Additional AMI resources will be added here as our marketplace portfolio expands.
-
-## Prerequisites
-
-- AWS CLI installed and configured
-- Appropriate AWS permissions for resource creation
-- Active subscription to the corresponding AWS Marketplace AMI
-
-## Getting Started
-
-1. **Clone this repository**:
-   ```bash
-   git clone https://github.com/[your-org]/aws-ami-resources.git
-   cd aws-ami-resources
-   ```
-
-2. **Navigate to the specific AMI resource directory**:
-   ```bash
-   cd [ami-name]  # e.g., prometheus-grafana
-   ```
-
-3. **Follow the README** in the specific AMI directory for detailed setup instructions.
-
-## Support
-
-### Documentation
-Each AMI resource directory contains:
-- Detailed README with setup instructions
-- CloudFormation template documentation
-- Script usage guides
-- Troubleshooting information
-
-### Getting Help
-- **Technical Issues**: Please open an issue in this repository
-- **AMI-specific questions**: Contact through AWS Marketplace support
-- **Feature requests**: Submit via GitHub issues with the "enhancement" label
-
-## Contributing
-
-We welcome contributions to improve these resources! Please:
-1. Fork this repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/improvement`)
-5. Create a Pull Request
-
-## Security
-
-- Never commit sensitive information (credentials, keys, etc.)
-- All scripts are provided as-is - review before running in production
-- Report security issues privately to [security@your-org.com]
-
-## License
-
-This repository is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
-
-## Updates
-
-This repository is regularly updated with:
-- New AMI resources as they become available
-- Updated scripts and templates
-- Bug fixes and improvements
-- Additional documentation
-
-⭐ **Star this repository** to stay updated with the latest resources!
+- **AMI products** - machine images launched on Amazon EC2.
+- **MCP server products** - containers hosted on Amazon Bedrock AgentCore Runtime,
+  listed under the AWS Marketplace "AI Agents and Tools" category.
 
 ---
 
-**Note**: Always refer to the specific AMI documentation in AWS Marketplace for the most up-to-date information about features and requirements.
+## Repository structure
+
+```
+aws-marketplace-resources/
+├── ami/                                  # AMI-based Marketplace products
+│   ├── argocd/                           # ArgoCD for Kubernetes Deployment
+│   │   └── getting-started.md
+│   └── prometheus-grafana/               # Prometheus & Grafana Monitoring
+│       ├── ReadMe.md
+│       ├── cloudformation/               # IAM / setup templates
+│       │   ├── iam_role_policy_setup.yaml
+│       │   └── usage.md
+│       └── scripts/                      # Installation / setup scripts
+│           └── install_node_exporter.sh
+└── mcp/                                  # MCP server Marketplace products
+    └── container/                        # Container delivery on Bedrock AgentCore Runtime
+        └── agentcore_runtime.md          # Universal Data Format Converter - usage guide
+```
+
+---
+
+## Products
+
+### MCP server products (container on Amazon Bedrock AgentCore Runtime)
+
+| Product | Description | Resources |
+|---|---|---|
+| Universal Data Format Converter | MCP server that converts and inspects CSV, TSV, JSON, NDJSON, YAML, XML, Excel, Parquet, and Avro, with format auto-detection and schema inference. | [Usage guide](mcp/container/agentcore_runtime.md) |
+
+### AMI products (Amazon EC2)
+
+| Product | Description | Resources |
+|---|---|---|
+| Prometheus & Grafana Monitoring | Production-ready monitoring stack with EC2 auto-discovery, prebuilt Grafana dashboards, IAM CloudFormation, and Node Exporter setup. | [Guide](ami/prometheus-grafana/ReadMe.md) |
+| ArgoCD for Kubernetes Deployment | GitOps continuous-delivery server for Kubernetes. | [Getting started](ami/argocd/getting-started.md) |
+
+---
+
+## Prerequisites
+
+- An active subscription to the corresponding product in AWS Marketplace.
+- AWS CLI v2 installed and configured.
+- Appropriate AWS permissions for the resources you create (EC2/IAM for AMI
+  products; IAM and Amazon Bedrock AgentCore for MCP products).
+
+---
+
+## Getting started
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/infoinlet-com/aws-marketplace-resources.git
+   cd aws-marketplace-resources
+   ```
+2. Open the guide for your product:
+   - MCP server (AgentCore): [`mcp/container/agentcore_runtime.md`](mcp/container/agentcore_runtime.md)
+   - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
+   - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
+3. Follow that guide for deployment and configuration.
+
+---
+
+## Support
+
+- Product-specific questions and entitlement issues: use the **Support** link on
+  the product's AWS Marketplace listing page.
+- Problems with the materials in this repository: open a GitHub issue.
+
+When reporting an issue, never include credentials, access keys, or other
+sensitive information.
+
+---
+
+## Notes
+
+- Scripts and templates are provided as-is; review them before running in
+  production.
+- AWS Marketplace listing pages are the authoritative source for each product's
+  current features, pricing, and requirements.
