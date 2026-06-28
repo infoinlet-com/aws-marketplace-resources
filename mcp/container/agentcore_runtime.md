@@ -264,13 +264,14 @@ Returns: `source_format`, `dialect`, `rows_sampled`, and `schema`.
 
 ## 6. Configuration
 
-Set these as container environment variables when you deploy (in the delivery
-option or runtime configuration):
+All settings are optional - the container ships with working defaults. Override
+them only if needed, as environment variables in the delivery option or runtime
+configuration.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `FC_MAX_INPUT_BYTES` | `536870912` (512 MiB) | Reject inputs larger than this, instead of risking out-of-memory. |
-| `FC_SCRATCH_DIR` | system temp | Directory for spilled (large) conversion results. |
+| `FC_MAX_INPUT_BYTES` | `536870912` (512 MiB) | Reject inputs larger than this, instead of risking out-of-memory. This is the main tunable. |
+| `FC_SCRATCH_DIR` | `/tmp/format-converter` (pre-set in the image) | Where large (over 256 KiB) results are written. Already configured and writable; normally leave it as-is. |
 
 ---
 
