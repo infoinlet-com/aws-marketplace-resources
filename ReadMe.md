@@ -28,7 +28,8 @@ aws-marketplace-resources/
 │           └── install_node_exporter.sh
 └── mcp/                                  # MCP server Marketplace products
     └── container/                        # Container delivery on Bedrock AgentCore Runtime
-        └── agentcore_runtime.md          # Universal Data Format Converter - usage guide
+        ├── universal_data_format_converter.md   # Usage guide
+        └── data_guard.md                        # Usage guide
 ```
 
 ---
@@ -39,7 +40,8 @@ aws-marketplace-resources/
 
 | Product | Description | Resources |
 |---|---|---|
-| Universal Data Format Converter | MCP server that converts and inspects CSV, TSV, JSON, NDJSON, YAML, XML, Excel, Parquet, and Avro, with format auto-detection and schema inference. | [Usage guide](mcp/container/agentcore_runtime.md) |
+| Universal Data Format Converter | MCP server that converts and inspects CSV, TSV, JSON, NDJSON, YAML, XML, Excel, Parquet, and Avro, with format auto-detection and schema inference. | [Usage guide](mcp/container/universal_data_format_converter.md) |
+| Data Guard | MCP server that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. | [Usage guide](mcp/container/data_guard.md) |
 
 ### AMI products (Amazon EC2)
 
@@ -67,7 +69,8 @@ aws-marketplace-resources/
    cd aws-marketplace-resources
    ```
 2. Open the guide for your product:
-   - MCP server (AgentCore): [`mcp/container/agentcore_runtime.md`](mcp/container/agentcore_runtime.md)
+   - Universal Data Format Converter (AgentCore): [`mcp/container/universal_data_format_converter.md`](mcp/container/universal_data_format_converter.md)
+   - Data Guard (AgentCore): [`mcp/container/data_guard.md`](mcp/container/data_guard.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
    - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
 3. Follow that guide for deployment and configuration.

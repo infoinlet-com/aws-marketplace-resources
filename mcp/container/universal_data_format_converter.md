@@ -147,7 +147,7 @@ By default the endpoint uses AWS IAM authentication. Sign each request with
 AWS Signature Version 4 (SigV4), service name `bedrock-agentcore`. (If you
 configured a JWT/OAuth authorizer instead, send a `Bearer` token.)
 
-### 4.3 Example: list tools and run a conversion (Python)
+### 4.3 Client setup (Python)
 
 ```python
 import json, urllib.parse, urllib.request
@@ -161,8 +161,13 @@ creds = boto3.Session().get_credentials().get_frozen_credentials()
 url = (f"https://bedrock-agentcore.{REGION}.amazonaws.com/runtimes/"
        f"{urllib.parse.quote(ARN, safe='')}/invocations?qualifier=DEFAULT")
 
-def call(method, params, _id):
-    body = json.dumps({"jsonrpc": "2.0", "id": _id, "method": method, "params": params})
+_id = 0
+
+def call(method, params=None):
+    global _id
+    _id += 1
+    body = json.dumps({"jsonrpc": "2.0", "id": _id, "method": method,
+                       "params": params or {}})
     req = AWSRequest(method="POST", url=url, data=body,
                      headers={"Content-Type": "application/json",
                               "Accept": "application/json, text/event-stream"})
@@ -174,17 +179,16 @@ def call(method, params, _id):
             return json.loads(line[6:])
     return json.loads(text)
 
-# Discover tools
-print(call("tools/list", {}, 1)["result"]["tools"])
+def tool(name, **arguments):
+    """Call an MCP tool and return its parsed JSON result."""
+    res = call("tools/call", {"name": name, "arguments": arguments})
+    return json.loads(res["result"]["content"][0]["text"])
 
-# Convert CSV to JSON
-res = call("tools/call", {
-    "name": "convert_data",
-    "arguments": {"to_format": "json", "text": "id,name\n1,alice\n2,bob\n"},
-}, 2)
-print(res["result"]["content"][0]["text"])
-# -> {... ,"text":"[{\"id\":1,\"name\":\"alice\"},{\"id\":2,\"name\":\"bob\"}]", ...}
+# Discover tools
+print(call("tools/list")["result"]["tools"])
 ```
+
+The `tool` helper is used by every example in section 6.
 
 ### 4.4 Wiring it into an MCP-capable agent
 
@@ -213,8 +217,8 @@ Supported format names: `csv`, `tsv`, `json`, `ndjson`, `yaml`, `xml`, `excel`,
 
 ### 5.1 list_supported_formats
 
-No arguments. Returns the readable/writable formats, aliases, and schema
-dialects.
+No arguments. Returns `read` and `write` (the format lists), `binary_formats`
+(the three that require `base64_data`), `aliases`, and `schema_dialects`.
 
 ### 5.2 inspect_data
 
@@ -227,6 +231,7 @@ Cheap probe of a dataset. Call this first when the format is unknown.
 
 Returns: `detected_format`, `encoding`, `delimiter`, `has_header`, `confidence`,
 `bytes`, `origin`, and (when parseable) `rows`, `columns`, `dtypes`, `preview`.
+Here `columns` is the list of column *names*; on `convert_data` it is a count.
 
 ### 5.3 convert_data
 
@@ -262,7 +267,173 @@ Returns: `source_format`, `dialect`, `rows_sampled`, and `schema`.
 
 ---
 
-## 6. Configuration
+## 6. Examples
+
+These use the `tool` helper from section 4.3. Responses are abridged to the
+fields each example is about.
+
+### 6.1 Check what the server supports
+
+```python
+tool("list_supported_formats")
+# -> {"read":  ["avro","csv","excel","json","ndjson","parquet","tsv","xml","yaml"],
+#     "write": ["avro","csv","excel","json","ndjson","parquet","tsv","xml","yaml"],
+#     "binary_formats": ["avro","excel","parquet"],
+#     "aliases": {"jsonl": "ndjson", "json-lines": "ndjson", "yml": "yaml",
+#                 "xlsx": "excel", "xls": "excel", "parq": "parquet"},
+#     "schema_dialects": ["json_schema","sql","avro","pydantic"]}
+```
+
+All nine formats both read and write, so any pair is a valid conversion.
+
+### 6.2 Inspect before converting
+
+Call this first when you do not control the input. It is cheap, and a low
+`confidence` tells you to pass `from_format` explicitly instead of guessing.
+
+```python
+tool("inspect_data", text="id	name
+1	Alice
+2	Bob
+", preview_rows=2)
+# -> {"detected_format": "tsv", "encoding": "ascii", "delimiter": "	",
+#     "has_header": true, "confidence": 0.7, "bytes": 22, "origin": "inline_text",
+#     "rows": 2, "columns": ["id", "name"],
+#     "dtypes": {"id": "Int64", "name": "String"},
+#     "preview": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]}
+```
+
+Use `preview_rows=0` for metadata only, with no row data in the model's context.
+
+### 6.3 Convert between text formats
+
+```python
+# CSV to JSON
+tool("convert_data", to_format="json", text="id,name
+1,alice
+2,bob
+")
+# -> {"source_format": "csv", "target_format": "json", "rows": 2, "columns": 2,
+#     "delivery": "inline_text", "bytes": 47,
+#     "text": "[{\"id\":1,\"name\":\"alice\"},{\"id\":2,\"name\":\"bob\"}]"}
+
+# JSON to NDJSON - the alias resolves, so target_format comes back as ndjson
+tool("convert_data", to_format="jsonl", text='[{"id":1},{"id":2}]')
+# -> {"target_format": "ndjson", "text": "{\"id\":1}
+{\"id\":2}
+"}
+
+# A nested object is JSON-encoded into the cell, so nothing is lost
+tool("convert_data", to_format="csv",
+     text='[{"id":1,"user":{"name":"alice","geo":{"country":"DE"}}}]')
+# -> {"text": "id,user
+1,\"{\"\"name\"\": \"\"alice\"\", \"\"geo\"\": {\"\"country\"\": \"\"DE\"\"}}\"
+"}
+```
+
+Note that the object is kept in one `user` column rather than flattened into
+`user.name` and `user.geo.country`.
+
+> **List-valued fields do not survive CSV, TSV, or Excel.** They are written as
+> an internal debug representation instead of JSON, and cannot be read back.
+> Use Parquet, Avro, JSON, NDJSON, or YAML for data containing lists - see
+> section 8.
+
+### 6.4 Binary formats
+
+Binary goes in as `base64_data` and comes back as `base64_data`.
+
+```python
+import base64
+
+res = tool("convert_data", to_format="parquet", text="id,name
+1,alice
+")
+# -> {"target_format": "parquet", "rows": 1, "columns": 2,
+#     "delivery": "inline_base64", "bytes": 821, "base64_data": "UEFSMR..."}
+open("out.parquet", "wb").write(base64.b64decode(res["base64_data"]))
+
+blob = base64.b64encode(open("out.parquet", "rb").read()).decode()
+tool("convert_data", to_format="json", base64_data=blob)
+# -> {"source_format": "parquet", "rows": 1, "text": "[{\"id\":1,\"name\":\"alice\"}]"}
+```
+
+### 6.5 Source options
+
+Overrides for inputs auto-detection gets wrong.
+
+```python
+# Semicolon-delimited, Latin-1
+tool("convert_data", to_format="json", text=EXPORT,
+     from_format="csv", delimiter=";", encoding="latin-1")
+
+# No header row - columns are named positionally, starting at 1
+tool("convert_data", to_format="json", text="1,alice
+", has_header=False)
+# -> {"text": "[{\"column_1\":1,\"column_2\":\"alice\"}]"}
+
+# A named Excel sheet
+tool("convert_data", to_format="csv", base64_data=xlsx, sheet="Q3 Actuals")
+
+# The repeated XML element that represents a row
+tool("convert_data", to_format="csv", text=XML, xml_record_tag="item")
+# -> {"text": "sku,price
+A-1,9.99
+B-2,14.50
+"}
+```
+
+`xml_record_tag` is rarely needed - detection picks the right element on its
+own for ordinary documents. Pass it when several repeated elements compete.
+
+### 6.6 Infer a schema
+
+```python
+CSV = "id,name,signed_up
+1,alice,2024-03-01
+"
+
+tool("infer_schema", text=CSV, dialect="sql", table_name="users")
+# -> {"source_format": "csv", "dialect": "sql", "rows_sampled": 1,
+#     "schema": 'CREATE TABLE users (
+  "id" BIGINT NOT NULL,
+
+#                "name" TEXT NOT NULL,
+  "signed_up" DATE NOT NULL
+);'}
+```
+
+`dialect` also takes `json_schema` (the default, returning an object schema),
+`avro`, and `pydantic`. Types are inferred from the rows actually read, and
+`rows_sampled` reports how many that was. The dialects do not always agree on
+the same column - a date reaches SQL as `DATE` but Pydantic as `str` - so check
+the output before generating a table from it.
+
+### 6.7 Large files
+
+Pass `path` to read a file already on the container filesystem. Results over
+256 KiB are written to the scratch directory and only the path comes back, so a
+large conversion never floods the model's context.
+
+```python
+res = tool("convert_data", to_format="json",
+           path="/tmp/uploads/events.ndjson", from_format="ndjson")
+# -> {"source_format": "ndjson", "rows": 60000, "columns": 4,
+#     "delivery": "path", "bytes": 6390373,
+#     "path": "/tmp/format-converter/converted.json"}
+
+# the returned path feeds straight into the next call
+tool("infer_schema", path=res["path"], dialect="sql", table_name="events")
+```
+
+The threshold applies to the *result*, not the input: a 6 MB NDJSON file
+converted to Parquet compresses to well under 256 KiB and comes back inline.
+Read `delivery` rather than assuming, and take the output from `text`,
+`base64_data`, or `path` accordingly.
+
+---
+
+## 7. Configuration
 
 All settings are optional - the container ships with working defaults. Override
 them only if needed, as environment variables in the delivery option or runtime
@@ -275,31 +446,38 @@ configuration.
 
 ---
 
-## 7. Limits and behavior
+## 8. Limits and behavior
 
 - Maximum input size defaults to 512 MiB (`FC_MAX_INPUT_BYTES`). Oversized
   inputs are rejected with a clear error.
 - Data is processed in memory; for very large files, prefer splitting the input
   or raising the limit within your container's memory.
-- Deeply nested JSON/XML is normalized to tabular rows; values that cannot fit a
-  flat cell (CSV/Excel) are JSON-encoded.
+- Deeply nested JSON/XML is normalized to tabular rows. A nested **object** in a
+  cell of a flat format (CSV, TSV, Excel) is JSON-encoded, so nothing is lost.
+- **Known issue: a list-valued field converted to CSV, TSV, or Excel is written
+  as an internal debug representation rather than JSON**, which is not
+  round-trippable. Convert such data to Parquet, Avro, JSON, NDJSON, or YAML,
+  all of which preserve lists correctly.
 - The server is stateless: every request is independent.
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Symptom | Likely cause and fix |
 |---|---|
 | Runtime never reaches READY | Check the execution role can pull the image and write logs; review CloudWatch logs under `/aws/bedrock-agentcore/`. |
 | 403 / signature errors when calling | Ensure SigV4 signing uses service `bedrock-agentcore` and your IAM principal is allowed to invoke the runtime. |
 | "Input too large" | Input exceeds `FC_MAX_INPUT_BYTES`; raise it or split the input. |
-| "Could not detect source format" | Pass `from_format` explicitly. |
+| "Could not detect source format" | Pass `from_format` explicitly. Single-column CSV/TSV is a common cause - there is no delimiter to find, so detection returns `unknown`. |
+| "Unsupported target format" / "Unsupported source format" | The name is not one of the nine formats or their aliases; `list_supported_formats` returns both lists. |
 | "Provide exactly one of text / base64_data / path" | Supply a single input argument. |
+| "no matching sheet found" | The `sheet` name does not exist in the workbook. Convert without `sheet` to read the first one. |
+| A list-valued column came back as `shape: (2,) Series...` | Known issue converting lists to CSV/TSV/Excel - see section 8. Use Parquet, Avro, JSON, NDJSON, or YAML instead. |
 
 ---
 
-## 9. Support
+## 10. Support
 
 For help with this product, contact the seller through the **Support** link on
 the product's AWS Marketplace listing page.
