@@ -1,14 +1,17 @@
 # AWS Marketplace Resources
 
 Supplementary resources, guides, scripts, and templates for our **AWS Marketplace
-products**. These materials help subscribers deploy and operate our offerings in
-their own AWS accounts.
+products**. These materials help subscribers deploy, integrate, and operate our
+offerings.
 
-The repository covers two delivery types:
+The repository covers three delivery types:
 
 - **AMI products** - machine images launched on Amazon EC2.
 - **MCP server products** - containers hosted on Amazon Bedrock AgentCore Runtime,
   listed under the AWS Marketplace "AI Agents and Tools" category.
+- **API products (SaaS)** - hosted HTTPS APIs you call with an API key, with
+  nothing to deploy. Also usable as MCP tools through an Amazon Bedrock
+  AgentCore Gateway.
 
 ---
 
@@ -16,6 +19,9 @@ The repository covers two delivery types:
 
 ```
 aws-marketplace-resources/
+├── api/                                  # API-based Marketplace products
+│   └── saas/                             # SaaS delivery, hosted by us
+│       └── data_guard.md                 # Usage guide
 ├── ami/                                  # AMI-based Marketplace products
 │   ├── argocd/                           # ArgoCD for Kubernetes Deployment
 │   │   └── getting-started.md
@@ -35,6 +41,12 @@ aws-marketplace-resources/
 ---
 
 ## Products
+
+### API products (SaaS)
+
+| Product | Description | Resources |
+|---|---|---|
+| Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Works directly or through an AgentCore Gateway. | [Usage guide](api/saas/data_guard.md) |
 
 ### MCP server products (container on Amazon Bedrock AgentCore Runtime)
 
@@ -57,7 +69,9 @@ aws-marketplace-resources/
 - An active subscription to the corresponding product in AWS Marketplace.
 - AWS CLI v2 installed and configured.
 - Appropriate AWS permissions for the resources you create (EC2/IAM for AMI
-  products; IAM and Amazon Bedrock AgentCore for MCP products).
+  products; IAM and Amazon Bedrock AgentCore for MCP products). SaaS API products
+  need only the API key issued after you subscribe, plus AgentCore permissions if
+  you use them through a Gateway.
 
 ---
 
@@ -71,6 +85,7 @@ aws-marketplace-resources/
 2. Open the guide for your product:
    - Universal Data Format Converter (AgentCore): [`mcp/container/universal_data_format_converter.md`](mcp/container/universal_data_format_converter.md)
    - Data Guard (AgentCore): [`mcp/container/data_guard.md`](mcp/container/data_guard.md)
+   - Data Guard API (SaaS): [`api/saas/data_guard.md`](api/saas/data_guard.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
    - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
 3. Follow that guide for deployment and configuration.

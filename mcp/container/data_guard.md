@@ -9,7 +9,7 @@ leaves your boundary. Nothing phones home, and no key is ever stored server side
 - Architecture: ARM64 (AWS Graviton), stateless, listens on port `8000`
 - Tools: `list_detectors`, `scan_data`, `redact_data`, `restore_data`, `check_policy`
 - Document kinds: text, JSON, NDJSON, YAML, CSV
-- Coverage: 63 entity types across PII, PHI, financial data, and secrets
+- Coverage: 64 entity types across PII, PHI, financial data, and secrets
 
 ---
 
