@@ -82,6 +82,26 @@ Your key, subscription state, and account details stay available at
 working immediately. Only a hash of the key is stored, so it is replaced, never
 recovered.
 
+### 3.1 Free trial
+
+The listing offers a free trial. Choose **Try for free** instead of a contract
+term, then follow steps 2 to 5 above - a trial is set up, activated, and issued
+a key exactly like a subscription.
+
+- **No charge.** Neither the contract fee nor usage is billed during the trial.
+- **Allowance:** 10,000 API calls or 1 GB of request data, whichever comes
+  first. The configure page shows how much is used. Past it, document calls
+  return `403 trial_limit_reached`; `GET /detectors` keeps working.
+- **Length:** shown on the listing page. One trial per AWS account.
+- **It does not convert on its own.** When it ends, calls return
+  `403 subscription_inactive`. To continue, subscribe from the listing page and
+  choose **Set up your account** again, attaching it to the same LLMLinq
+  account. Your API key stays the same.
+
+If you subscribe while the trial is still running, calls are billed to the
+subscription from the moment it activates, and the trial allowance no longer
+applies.
+
 ---
 
 ## 4. Call the API
@@ -611,6 +631,7 @@ Errors are JSON: `{"error": "<code>"}`, plus `message` where it helps. Branch on
 | 401 | `api_key_required` | No key, or a value that is not a Data Guard key. |
 | 401 | `invalid_api_key` | A key we did not issue, or one that has been rotated. |
 | 403 | `subscription_inactive` | The key is valid but the subscription is not active (`state` says why). Fixed in AWS Marketplace, not with a new key. |
+| 403 | `trial_limit_reached` | A free trial has used its allowance; `limits` states it. Subscribe to continue with the same key (section 3.1). |
 | 404 | `not_found` | Unknown path or method. |
 | 413 | `result_too_large` | The result exceeds 256 KiB. Redaction can grow a document; split it. |
 | 429 | - | Throttled. Retry with exponential backoff. |
@@ -664,6 +685,9 @@ in the AWS Billing console.
 A contract cannot be cancelled mid-term from the console. Turn off auto-renewal
 to stop further billing, and see the refund policy on the listing.
 
+A free trial is not billed and its usage is not reported to AWS Marketplace at
+all. See section 3.1 for its allowance.
+
 ### 9.2 What this product does and does not claim
 
 This service supports de-identification under the HIPAA Safe Harbor method and
@@ -688,6 +712,7 @@ account, use the container product instead.
 | `401 api_key_required` | No `Authorization` or `X-Api-Key` header, or the value does not start with `llq_live_`. |
 | `401 invalid_api_key` | The key was rotated or mistyped. Copy the current key, or rotate it at `cloud.llmlinq.com/aws/data-guard/configure`. |
 | `403 subscription_inactive` | The subscription has ended, or has not finished activating. Check AWS Marketplace and the configure page. |
+| `403 trial_limit_reached` | The free trial used its allowance. Subscribe from the listing page and set up your account again; the key stays the same. |
 | Setup page shows "We could not confirm that subscription" | Start again from **Set up your account** in the AWS Marketplace console; the setup link is single-use and expires. |
 | `400 unsupported_parameters` with `path` | File paths are not accepted over HTTP. Send the content as `text` or `base64_data`. |
 | `400` "The 'hash' strategy requires a key" | Pass `key`. `gdpr_basic` uses `hash`, so it needs one too. |

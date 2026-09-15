@@ -39,6 +39,29 @@ Two properties hold on every call:
   restore is all-or-nothing. A half-redacted document that reports success is
   exactly what the design prevents.
 
+### 1.1 Try it free before subscribing
+
+This container listing is a monthly subscription and has no free trial of its
+own. The same detection engine is also sold as a hosted HTTPS API, **Data Guard
+- PII, PHI, and Secret Redaction API**, on AWS Marketplace, and that listing
+offers a free trial. It runs the same detectors, policy packs, and redaction
+strategies, so it is a way to check detection quality on your kind of data
+before deploying this container.
+
+Three differences matter when you evaluate that way:
+
+- **The API is hosted by the seller**, not in your account. Documents you send
+  to it leave your AWS boundary, so evaluate with synthetic or already-approved
+  sample data. This container is the product for keeping data in your account.
+- **Tool names become endpoints**: `scan_data` is `POST /scan`, `redact_data` is
+  `POST /redact`, and so on, with the same arguments except `path`, which the
+  API does not accept.
+- **The API takes requests up to about 6 MB**, where this container accepts
+  16 MiB by default.
+
+Trial terms, allowance, and setup are in the
+[Data Guard API usage guide](../../api/saas/data_guard.md#31-free-trial).
+
 ---
 
 ## 2. Prerequisites
