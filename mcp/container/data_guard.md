@@ -43,10 +43,11 @@ Two properties hold on every call:
 
 This container listing is a monthly subscription and has no free trial of its
 own. We also offer the same detection engine as a hosted HTTPS API on AWS
-Marketplace, the **Data Guard API** listing, and that listing includes a free
-trial. It runs the same detectors, policy packs, and redaction strategies, so
-you can check detection quality on your kind of data before deploying this
-container.
+Marketplace, the
+[Data Guard API](https://aws.amazon.com/marketplace/pp/prodview-i4qrny5rdr3o2)
+listing, and that listing includes a free trial. It runs the same detectors,
+policy packs, and redaction strategies, so you can check detection quality on
+your kind of data before deploying this container.
 
 Two things to know when you evaluate that way:
 
