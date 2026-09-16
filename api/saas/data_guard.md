@@ -98,9 +98,9 @@ a key exactly like a subscription.
   choose **Set up your account** again, attaching it to the same LLMLinq
   account. Your API key stays the same.
 
-If you subscribe while the trial is still running, calls are billed to the
-subscription from the moment it activates, and the trial allowance no longer
-applies.
+If you subscribe while the trial is still running, calls count toward the
+subscription from the moment it activates - its monthly allowance first, then
+usage billing (section 9.1) - and the trial allowance no longer applies.
 
 ---
 
@@ -671,11 +671,19 @@ we cannot see your document.
 ### 9.1 Billing
 
 The subscription is a contract (monthly or annual) plus usage, billed through
-AWS Marketplace. Current prices are on the listing page. Usage is measured on
-two dimensions:
+AWS Marketplace. Current prices are on the listing page.
 
-- **API calls**, per 1,000 successful calls.
-- **Document volume**, per GB of request body submitted.
+**The contract fee includes 25,000 API calls and 1 GB of request data every
+month**, on monthly and annual contracts alike. Only usage beyond that is
+billed, on two dimensions:
+
+- **API calls**, per 1,000 successful calls beyond 25,000 in the month.
+- **Document volume**, per GB of request body submitted beyond 1 GB in the
+  month.
+
+The allowance runs per calendar month in UTC and resets at 00:00 UTC on the
+first of each month. Unused allowance does not carry over. The configure page
+shows how much of this month's allowance is used and when it resets.
 
 Only calls that the service answers successfully are counted. A `400`, `401`,
 `403`, or `413` is not billed. Your subscription state is shown at
