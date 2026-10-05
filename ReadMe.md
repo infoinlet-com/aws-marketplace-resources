@@ -35,7 +35,8 @@ aws-marketplace-resources/
 └── mcp/                                  # MCP server Marketplace products
     └── container/                        # Container delivery on Bedrock AgentCore Runtime
         ├── universal_data_format_converter.md   # Usage guide
-        └── data_guard.md                        # Usage guide
+        ├── data_guard.md                        # Usage guide
+        └── security_finding_converter.md        # Usage guide
 ```
 
 ---
@@ -54,6 +55,7 @@ aws-marketplace-resources/
 |---|---|---|
 | Universal Data Format Converter | MCP server that converts and inspects CSV, TSV, JSON, NDJSON, YAML, XML, Excel, Parquet, and Avro, with format auto-detection and schema inference. | [Usage guide](mcp/container/universal_data_format_converter.md) |
 | Data Guard | MCP server that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. | [Usage guide](mcp/container/data_guard.md) |
+| Security Finding Converter | MCP server that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](mcp/container/security_finding_converter.md) |
 
 ### AMI products (Amazon EC2)
 
@@ -85,6 +87,7 @@ aws-marketplace-resources/
 2. Open the guide for your product:
    - Universal Data Format Converter (AgentCore): [`mcp/container/universal_data_format_converter.md`](mcp/container/universal_data_format_converter.md)
    - Data Guard (AgentCore): [`mcp/container/data_guard.md`](mcp/container/data_guard.md)
+   - Security Finding Converter (AgentCore): [`mcp/container/security_finding_converter.md`](mcp/container/security_finding_converter.md)
    - Data Guard API (SaaS): [`api/saas/data_guard.md`](api/saas/data_guard.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
    - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
