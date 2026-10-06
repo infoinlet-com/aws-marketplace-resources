@@ -95,29 +95,29 @@ OCSF releases are added in later versions of this product.
 
 ## 3. Deploy to Amazon Bedrock AgentCore Runtime
 
-You can deploy from the AgentCore console (select this product's container
-image) or with the AWS CLI. The CLI flow below is fully reproducible.
-
-Set shared variables:
+The product's fulfillment page in AWS Marketplace (**Continue to Launch**) shows
+these same steps with your account ID and the image URI already filled in, and
+you can copy them from there. They are reproduced here with shell variables.
+You can also deploy from the Amazon Bedrock AgentCore console instead of the CLI.
 
 ```bash
 export AWS_REGION=us-east-1
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-# The container image URI is provided on your AWS Marketplace fulfillment page
-# after you subscribe. It looks like:
-#   <registry>.dkr.ecr.<region>.amazonaws.com/<path>/security-finding-converter-mcp:<version>
-export IMAGE_URI="<paste-the-image-uri-from-your-fulfillment-page>"
+# From your fulfillment page:
+export IMAGE_URI="709825985650.dkr.ecr.us-east-1.amazonaws.com/info-inlet/security-finding-converter-mcp:<version>"
 ```
 
-### 3.1 Create an execution role
+### 3.1 Create an IAM role
 
-AgentCore assumes this role to pull the image and write logs.
+AgentCore assumes this role to pull the image and write logs. The trust policy
+lets AgentCore in your account assume it:
 
 ```bash
-cat > trust.json <<JSON
+cat > trustpolicy.json <<JSON
 {
   "Version": "2012-10-17",
   "Statement": [{
+    "Sid": "AssumeRolePolicy",
     "Effect": "Allow",
     "Principal": { "Service": "bedrock-agentcore.amazonaws.com" },
     "Action": "sts:AssumeRole",
@@ -129,55 +129,78 @@ cat > trust.json <<JSON
 }
 JSON
 
-cat > perms.json <<JSON
+aws iam create-role \
+  --role-name bedrock-agentcore-role \
+  --assume-role-policy-document "file://trustpolicy.json"
+```
+
+### 3.2 Attach the permissions policy
+
+This is the policy AWS shows on the fulfillment page, less one statement:
+AWS's template also allows invoking Bedrock foundation models, and Security Finding Converter
+never calls a model, so it is left out. To read findings from S3 with an `s3://` path (section 5), also allow `s3:GetObject` on that bucket.
+
+```bash
+cat > permissionspolicy.json <<JSON
 {
   "Version": "2012-10-17",
   "Statement": [
+    { "Sid": "ECRImageAccess", "Effect": "Allow",
+      "Action": ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"],
+      "Resource": ["arn:aws:ecr:${AWS_REGION}:709825985650:repository/*"] },
+    { "Sid": "ECRTokenAccess", "Effect": "Allow",
+      "Action": ["ecr:GetAuthorizationToken"], "Resource": "*" },
     { "Effect": "Allow",
-      "Action": ["ecr:BatchGetImage","ecr:GetDownloadUrlForLayer","ecr:BatchCheckLayerAvailability"],
-      "Resource": "*" },
-    { "Effect": "Allow", "Action": "ecr:GetAuthorizationToken", "Resource": "*" },
+      "Action": ["logs:DescribeLogStreams", "logs:CreateLogGroup"],
+      "Resource": ["arn:aws:logs:${AWS_REGION}:${ACCOUNT_ID}:log-group:/aws/bedrock-agentcore/runtimes/*"] },
     { "Effect": "Allow",
-      "Action": ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
-      "Resource": "arn:aws:logs:${AWS_REGION}:${ACCOUNT_ID}:log-group:/aws/bedrock-agentcore/*" },
+      "Action": ["logs:DescribeLogGroups"],
+      "Resource": ["arn:aws:logs:${AWS_REGION}:${ACCOUNT_ID}:log-group:*"] },
     { "Effect": "Allow",
-      "Action": ["bedrock-agentcore:GetWorkloadAccessToken","bedrock-agentcore:GetWorkloadAccessTokenForJWT","bedrock-agentcore:GetWorkloadAccessTokenForUserId"],
-      "Resource": "*" }
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": ["arn:aws:logs:${AWS_REGION}:${ACCOUNT_ID}:log-group:/aws/bedrock-agentcore/runtimes/*:log-stream:*"] },
+    { "Effect": "Allow",
+      "Action": ["xray:PutTraceSegments", "xray:PutTelemetryRecords",
+                 "xray:GetSamplingRules", "xray:GetSamplingTargets"],
+      "Resource": ["*"] },
+    { "Effect": "Allow", "Action": "cloudwatch:PutMetricData", "Resource": "*",
+      "Condition": { "StringEquals": { "cloudwatch:namespace": "bedrock-agentcore" } } },
+    { "Sid": "GetAgentAccessToken", "Effect": "Allow",
+      "Action": ["bedrock-agentcore:GetWorkloadAccessToken",
+                 "bedrock-agentcore:GetWorkloadAccessTokenForJWT",
+                 "bedrock-agentcore:GetWorkloadAccessTokenForUserId"],
+      "Resource": [
+        "arn:aws:bedrock-agentcore:${AWS_REGION}:${ACCOUNT_ID}:workload-identity-directory/default",
+        "arn:aws:bedrock-agentcore:${AWS_REGION}:${ACCOUNT_ID}:workload-identity-directory/default/workload-identity/*"] }
   ]
 }
 JSON
 
-aws iam create-role --role-name security-finding-converter-mcp-role \
-  --assume-role-policy-document file://trust.json --region "$AWS_REGION"
-aws iam put-role-policy --role-name security-finding-converter-mcp-role \
-  --policy-name exec --policy-document file://perms.json
-export ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/security-finding-converter-mcp-role"
+aws iam put-role-policy \
+  --role-name bedrock-agentcore-role \
+  --policy-name bedrock-agentcore-permissions \
+  --policy-document "file://permissionspolicy.json"
+
+export ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/bedrock-agentcore-role"
 ```
 
-To let the server read findings from S3 with an `s3://` path (section 5),
-add `s3:GetObject` (and `s3:GetObjectVersion` if you use versioning) on that
-bucket to `perms.json`. Nothing else needs S3.
-
-### 3.2 Create the agent runtime
+### 3.3 Create the agent runtime
 
 ```bash
-cat > runtime.json <<JSON
-{
-  "agentRuntimeName": "security_finding_converter_mcp",
-  "agentRuntimeArtifact": { "containerConfiguration": { "containerUri": "${IMAGE_URI}" } },
-  "roleArn": "${ROLE_ARN}",
-  "networkConfiguration": { "networkMode": "PUBLIC" },
-  "protocolConfiguration": { "serverProtocol": "MCP" }
-}
-JSON
-
 aws bedrock-agentcore-control create-agent-runtime \
-  --region "$AWS_REGION" --cli-input-json file://runtime.json
+  --region "$AWS_REGION" \
+  --agent-runtime-name "security_finding_converter" \
+  --agent-runtime-artifact "{\"containerConfiguration\": {\"containerUri\": \"$IMAGE_URI\"}}" \
+  --role-arn "$ROLE_ARN" \
+  --network-configuration '{"networkMode": "PUBLIC"}' \
+  --protocol-configuration '{"serverProtocol": "MCP"}' \
+  --environment-variables '{"SFC_MAX_INPUT_BYTES": "33554432", "SFC_SCRATCH_DIR": "/tmp"}'
 ```
 
-Note the returned `agentRuntimeId` and `agentRuntimeArn`.
+The environment variables are optional; the values above are the defaults.
+See section 7 for what each one does. Note the returned `agentRuntimeArn` and `agentRuntimeId`.
 
-### 3.3 Wait until READY
+### 3.4 Wait until READY
 
 ```bash
 aws bedrock-agentcore-control get-agent-runtime \
@@ -185,7 +208,22 @@ aws bedrock-agentcore-control get-agent-runtime \
   --query status --output text
 ```
 
-When status is `READY`, the server is live.
+### 3.5 Test it with the AWS CLI
+
+List the tools, using the runtime ARN from 3.3:
+
+```bash
+export PAYLOAD='{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {"_meta": {"progressToken": 1}}}'
+
+aws bedrock-agentcore invoke-agent-runtime \
+  --agent-runtime-arn "<agentRuntimeArn>" \
+  --content-type "application/json" \
+  --accept "application/json, text/event-stream" \
+  --payload "$(echo -n "$PAYLOAD" | base64)" output.json
+```
+
+`output.json` lists the four tools. You can also invoke the runtime from the
+Amazon Bedrock AgentCore console.
 
 ---
 
@@ -275,7 +313,7 @@ Provide findings with **exactly one** of these arguments:
 - `text` - the same as a string, including NDJSON (one finding per line)
 - `base64_data` - the same, base64-encoded
 - `path` - a file path on the container filesystem, or an `s3://bucket/key`
-  object (the execution role needs `s3:GetObject`, section 3.1)
+  object (the execution role needs `s3:GetObject`, section 3.2)
 
 Converted findings return inline when they total under 256 KiB. Larger results
 are written to a scratch file and `path` comes back instead of `findings`;
@@ -605,7 +643,7 @@ not guarantee that Security Hub will accept a finding.
 | Output has `path` instead of `findings` | The result was over 256 KiB and was written to the scratch directory. Send fewer findings per call to get them inline. |
 | "Input too large" | Input exceeds `SFC_MAX_INPUT_BYTES`; raise it or split the input. |
 | "Provide exactly one of findings / text / base64_data / path" | Supply a single input argument. |
-| "Could not read s3://..." | The execution role needs `s3:GetObject` on that bucket (section 3.1). |
+| "Could not read s3://..." | The execution role needs `s3:GetObject` on that bucket (section 3.2). |
 
 ---
 
