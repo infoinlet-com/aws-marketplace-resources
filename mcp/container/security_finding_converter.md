@@ -107,6 +107,21 @@ export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 export IMAGE_URI="709825985650.dkr.ecr.us-east-1.amazonaws.com/info-inlet/security-finding-converter-mcp:<version>"
 ```
 
+### Optional: pull the image
+
+AgentCore pulls the image itself when you create the runtime, so this is only
+for inspecting or scanning it locally. These are the commands on the
+fulfillment page:
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login   --username AWS --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
+
+docker pull --platform linux/arm64   709825985650.dkr.ecr.us-east-1.amazonaws.com/info-inlet/security-finding-converter-mcp:<version>
+```
+
+The image is built for ARM64 (AWS Graviton); `--platform linux/arm64` lets an
+x86 machine pull it.
+
 ### 3.1 Create an IAM role
 
 AgentCore assumes this role to pull the image and write logs. The trust policy
