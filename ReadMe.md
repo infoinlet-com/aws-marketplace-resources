@@ -50,6 +50,7 @@ aws-marketplace-resources/
 |---|---|---|
 | Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Works directly or through an AgentCore Gateway. | [Usage guide](api/saas/data_guard.md) |
 | Security Finding Converter API | HTTPS API that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](api/saas/security_finding_converter.md) |
+| AI Cloud Gateway | OpenAI-compatible HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. | [Usage guide](api/saas/ai_cloud_gateway.md) |
 
 ### MCP server products (container on Amazon Bedrock AgentCore Runtime)
 
@@ -92,6 +93,7 @@ aws-marketplace-resources/
    - Security Finding Converter (AgentCore): [`mcp/container/security_finding_converter.md`](mcp/container/security_finding_converter.md)
    - Data Guard API (SaaS): [`api/saas/data_guard.md`](api/saas/data_guard.md)
    - Security Finding Converter API (SaaS): [`api/saas/security_finding_converter.md`](api/saas/security_finding_converter.md)
+   - AI Cloud Gateway (SaaS): [`api/saas/ai_cloud_gateway.md`](api/saas/ai_cloud_gateway.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
    - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
 3. Follow that guide for deployment and configuration.
