@@ -45,8 +45,12 @@ the same model. Response headers say which model answered and why (section 5.3).
 - An AWS account whose Amazon Bedrock you want requests to run in. It can be the
   account that subscribed or any other account you control. You need permission
   to create a CloudFormation stack with an IAM role in it.
-- **Model access enabled in Amazon Bedrock** in that account, in the region you
-  connect, for the models you want used. A model without access is skipped.
+- **Models enabled in Amazon Bedrock** in that account, in the region you
+  connect. Amazon Nova, Meta Llama and OpenAI gpt-oss work on first use.
+  **Anthropic Claude models need a one-time AWS Marketplace subscription in
+  your account**, which an administrator accepts by enabling the models in the
+  Bedrock console (section 6.1). The AI Cloud Gateway role cannot accept it for
+  you, by design. Until a model is enabled, requests are routed to the others.
 - Supported regions for the connection: `us-east-1`, `us-east-2`, `us-west-2`.
 - An HTTP client or any OpenAI-format SDK.
 
@@ -174,10 +178,10 @@ unique to your subscription.
 5. Back in the dashboard, paste the Role ARN, pick the region (`us-east-1`,
    `us-east-2` or `us-west-2`), and choose **Test and save**.
 6. The check assumes the role exactly as the router does and lists the Bedrock
-   text models in that region. On success the page shows the connected account
-   and how many models are available.
-7. In the Bedrock console of that account and region, make sure **model access**
-   is enabled for the models you want requests routed to.
+   text models in that region. On success the page shows the connected account,
+   how many models are available, and **which catalog models your account has
+   not enabled yet**.
+7. If any are listed, enable them (section 6.1), then choose **Test again**.
 
 What the stack creates: one IAM role, `AICloudGatewayRouter`, with a maximum
 session of one hour. It trusts only the AI Cloud Gateway router role, and only
@@ -186,7 +190,15 @@ with your External ID. Its permissions are limited to:
 - `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` on
   foundation models and on inference profiles in your account;
 - `bedrock:ListFoundationModels`, `bedrock:GetFoundationModel`,
-  `bedrock:ListInferenceProfiles` and `bedrock:GetInferenceProfile`.
+  `bedrock:GetFoundationModelAvailability`, `bedrock:ListInferenceProfiles` and
+  `bedrock:GetInferenceProfile` (read-only; the availability call is how the
+  dashboard tells you which models are not enabled).
+
+It has no AWS Marketplace permissions, so it can never subscribe your account to
+a model provider's terms. A stack created before
+`GetFoundationModelAvailability` was added still works; the dashboard then says
+it could not check model access. Relaunch the stack from the dashboard link to
+get the check.
 
 It cannot read or change anything else in your account. To disconnect, delete
 the stack; calls then fail with `403 bedrock_access_denied`.
@@ -200,6 +212,27 @@ If **Test and save** fails:
 | "This role is in AI Cloud Gateway's AWS account" | Use a role in your own AWS account |
 
 A failed re-check leaves an existing working connection in place.
+
+### 6.1 Enable models in your AWS account
+
+Amazon Bedrock serves some providers' models, Anthropic's among them, through an
+AWS Marketplace subscription that each AWS account accepts once. Bedrock makes
+it on the first use of the model by someone allowed to subscribe, and it can
+take a few minutes to complete.
+
+1. Sign in to the connected AWS account as a user or role with permission for
+   `aws-marketplace:Subscribe` and `aws-marketplace:ViewSubscriptions` (an
+   administrator).
+2. Open the Amazon Bedrock console in the connected region, go to the **Model
+   catalog**, and open each model the dashboard listed.
+3. Enable it, or try it once in the playground. For Anthropic models, AWS may
+   first ask for a short use-case form.
+4. Wait a few minutes, then choose **Test again** in the dashboard. The model
+   leaves the list once Bedrock reports it as available.
+
+Requests keep working meanwhile: the gateway routes them to models your account
+can use. A request pinned to a model that is not enabled fails with
+`403 bedrock_model_not_enabled`.
 
 ---
 
@@ -382,7 +415,8 @@ exceptions. `code` is a stable identifier you can match on.
 | 401 | `invalid_api_key` | The key is wrong, or was revoked |
 | 403 | `subscription_inactive` | Your dashboard account has no active subscription: it is still `pending`, it was cancelled or it expired. Check **Subscriptions** in the dashboard and your agreement in AWS Marketplace |
 | 403 | `bedrock_not_connected` | Your subscription is active but no AWS account is connected. Complete section 6 |
-| 403 | `bedrock_access_denied` | Your AWS account could not run any of the candidate models: model access is not enabled in Bedrock, or the role was deleted or changed |
+| 403 | `bedrock_model_not_enabled` | Your AWS account has not enabled the named models in Bedrock yet. The message names them and the region. Enable them once (section 6.1) |
+| 403 | `bedrock_access_denied` | Your AWS account could not run any of the candidate models: the role was deleted or changed, or the models are not offered in the connected region |
 | 403 | `model_not_permitted` | The pinned model is not allowed for your account |
 | 403 | `direct_access_forbidden` | The request reached the gateway without passing through `api.aicloudgateway.com`. Call `https://api.aicloudgateway.com/v1` |
 | 404 | `model_not_found` | The pinned model id is not in the catalog. `GET /models` lists valid ids |
@@ -494,7 +528,8 @@ subscription ends, calls return `403 subscription_inactive`.
 | Claim fails: the subscription is linked to another account | The subscription was already claimed by a different dashboard account. Sign in with that account, or contact support |
 | Subscription stays `pending` | AWS has not yet confirmed the purchase. Wait a few minutes and reload. If it stays pending for over an hour, contact support with your AWS account ID |
 | `403 bedrock_not_connected` | Connect your AWS account (section 6) |
-| `403 bedrock_access_denied` | Enable model access in the Bedrock console for the connected region, and check the `AICloudGatewayRouter` stack still exists |
+| `403 bedrock_model_not_enabled`, or Claude never answers while Nova does | Enable the models in your account (section 6.1). The **AWS account** page lists the ones still missing |
+| `403 bedrock_access_denied` | Check the `AICloudGatewayRouter` stack still exists and is unchanged, and that the connected region offers the models |
 | `403 subscription_inactive` | The subscription is pending, cancelled or expired. Check **Subscriptions** |
 | `401 invalid_api_key` | The key was revoked or mistyped. Create a new one on **API keys** |
 | `400 no_eligible_model` | The input is too long for every allowed model, or needs a capability none has. Trim the conversation |
