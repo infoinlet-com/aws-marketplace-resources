@@ -1,17 +1,15 @@
 # AI Cloud Gateway (SaaS) - Usage Guide
 
 This guide explains how to subscribe to and use **AI Cloud Gateway**, an LLM
-router sold as a SaaS subscription in AWS Marketplace. It serves an HTTPS API in
-the OpenAI Chat Completions format, picks a suitable Amazon Bedrock model for
-each request, and runs the request **in your own AWS account** through a role
-you create with one CloudFormation stack.
+router sold as a SaaS subscription in AWS Marketplace. It picks a suitable
+Amazon Bedrock model for each request and runs the request **in your own AWS
+account** through a role you create with one CloudFormation stack.
 
 - Base URL: `https://api.aicloudgateway.com/v1`
 - Authentication: API key, `Authorization: Bearer acg_...`
 - Endpoints: `POST /chat/completions`, `GET /models`
-- Wire format: compatible with the OpenAI API format, so the OpenAI SDKs and
-  frameworks built on them work by changing the base URL and the key. AI Cloud
-  Gateway is not affiliated with OpenAI.
+- Clients: existing SDKs and agent frameworks work by changing the base URL and
+  the key (section 5).
 - Inference: Amazon Bedrock in your AWS account. **Bedrock token usage is billed
   by AWS to your own AWS account.** AI Cloud Gateway bills only for routing.
 - Dashboard: `https://dashboard.aicloudgateway.com`
@@ -254,7 +252,9 @@ move your requests to stronger, more expensive models.
 
 ### 8.1 POST /chat/completions
 
-The OpenAI Chat Completions request format. Parameters that do not apply are
+The request follows the OpenAI Chat Completions format, so the OpenAI SDKs and
+frameworks built on them work unchanged. AI Cloud Gateway is not affiliated with
+OpenAI. Parameters that do not apply are
 ignored rather than rejected, because SDKs send some of them by default.
 
 | Field | Type | Default | Notes |
