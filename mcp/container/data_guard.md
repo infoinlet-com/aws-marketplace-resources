@@ -192,7 +192,7 @@ aws bedrock-agentcore-control create-agent-runtime \
   --role-arn "$ROLE_ARN" \
   --network-configuration '{"networkMode": "PUBLIC"}' \
   --protocol-configuration '{"serverProtocol": "MCP"}' \
-  --environment-variables '{"DG_MAX_INPUT_BYTES": "16777216", "DG_SCRATCH_DIR": "/tmp/data-guard"}'
+  --environment-variables '{"DG_MAX_INPUT_BYTES": "4194304", "DG_SCRATCH_DIR": "/tmp/data-guard"}'
 ```
 
 The environment variables are optional; the values above are the defaults.
@@ -685,7 +685,7 @@ them as environment variables in the delivery option or runtime configuration.
 |---|---|---|
 | `DG_TOKEN_KEY` | unset | Default key for the `hash` and `encrypt` strategies, and therefore for the `gdpr_basic` pack. Set it if you would rather callers did not pass `key` on every call. Store it in a secret manager, separate from redacted output - anyone holding it can re-link `hash` tokens and decrypt `encrypt` placeholders. |
 | `DG_AUDIT_LOG` | off | Where to write one JSON line per data-touching call. `stderr` or `1` sends it to the container's stderr, which is CloudWatch under AgentCore; `stdout` likewise; any other value is treated as a file path. Records carry counts, hashes, rule names, and configuration only - never any part of the document. |
-| `DG_MAX_INPUT_BYTES` | `16777216` (16 MiB) | Reject inputs larger than this, checked before reading. The limit is about CPU rather than memory: detection cost is roughly bytes multiplied by the number of rules. |
+| `DG_MAX_INPUT_BYTES` | `4194304` (4 MiB) | Reject inputs larger than this, checked before reading. The limit is about CPU rather than memory: detection cost is roughly bytes multiplied by the number of rules. |
 | `DG_SCRATCH_DIR` | `/tmp/data-guard` (pre-set in the image) | Where redaction results over 256 KiB are written. Already configured and writable; normally leave it as-is. |
 | `DG_LOG_REFUSALS` | off | Set to `1` to log one line per deliberately refused request. Useful when a caller reports a failing call and you want to confirm it arrived. |
 | `PORT` | `8000` | Listen port. AgentCore expects 8000; changing it is not supported. |
@@ -731,7 +731,7 @@ Treat it as an outage even though the process is running.
 
 ## 8. Limits and behavior
 
-- Maximum input size defaults to 16 MiB (`DG_MAX_INPUT_BYTES`). Oversized inputs
+- Maximum input size defaults to 4 MiB (`DG_MAX_INPUT_BYTES`). Oversized inputs
   are rejected before being read, with a clear error.
 - Redaction results over 256 KiB spill to a scratch file, and only the path is
   returned, so nothing large floods the model context. Restored plaintext never
