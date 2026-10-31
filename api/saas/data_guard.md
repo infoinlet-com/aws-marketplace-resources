@@ -647,7 +647,7 @@ we cannot see your document.
 
 | Limit | Value |
 |---|---|
-| Request body | about 6 MB (the AWS Lambda synchronous invocation limit) |
+| Document | 4 MiB in every format; larger is a `400`. Split it |
 | Response | up to 256 KiB, always inline; larger results are `413 result_too_large` |
 | Rate | 100 requests/second per endpoint across the service, with bursts to 200 |
 | Document walk | 200,000 leaf values, after which `document_truncated` is set |
@@ -727,7 +727,7 @@ account, use the container product instead.
 | `400` "No encrypted placeholders were found" | `/restore` only reverses `encrypt` output, which looks like `<US_SSN:enc:...>`. |
 | `400` "Could not restore ... no changes were applied" | The key differs from the one used at redaction time, or a placeholder was modified. |
 | `413 result_too_large` | Split the document and send it in pieces. |
-| Request fails for a very large document before reaching the API | The body is over the ~6 MB request limit. Split it. |
+| `400` naming "Input too large" | The document is over the 4 MiB limit. Split it and send it in parts. |
 | Fewer findings than expected in JSON or CSV | The document may have failed to parse and been scanned as text. Check `document_kind`, and pass `kind` explicitly. |
 | A person's name was not redacted | Expected when the name has no surrounding cue. Supply it through `extra_spans`. |
 | More findings than expected | Narrow with `entity_types`, or raise `min_confidence`. `strict_all` over-redacts by design. |
