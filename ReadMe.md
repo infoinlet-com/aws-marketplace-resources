@@ -21,6 +21,12 @@ The repository covers three delivery types:
 aws-marketplace-resources/
 ├── api/                                  # API-based Marketplace products
 │   └── saas/                             # SaaS delivery, hosted by us
+│       ├── ai_cloud_gateway/             # Guide set: start at README.md
+│       │   ├── README.md                 # Index: what each page is for
+│       │   ├── getting-started.md        # Subscribe to first call
+│       │   ├── examples.md
+│       │   ├── troubleshooting.md
+│       │   └── ...                       # Routing, AWS account, API reference, billing, data
 │       ├── data_guard.md                 # Usage guide
 │       └── security_finding_converter.md # Usage guide
 ├── ami/                                  # AMI-based Marketplace products
@@ -50,7 +56,7 @@ aws-marketplace-resources/
 |---|---|---|
 | Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Works directly or through an AgentCore Gateway. | [Usage guide](api/saas/data_guard.md) |
 | Security Finding Converter API | HTTPS API that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](api/saas/security_finding_converter.md) |
-| AI Cloud Gateway | OpenAI-compatible HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. | [Usage guide](api/saas/ai_cloud_gateway.md) |
+| AI Cloud Gateway | HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. | [Getting started](api/saas/ai_cloud_gateway/getting-started.md) · [All docs](api/saas/ai_cloud_gateway/README.md) |
 
 ### MCP server products (container on Amazon Bedrock AgentCore Runtime)
 
@@ -93,7 +99,7 @@ aws-marketplace-resources/
    - Security Finding Converter (AgentCore): [`mcp/container/security_finding_converter.md`](mcp/container/security_finding_converter.md)
    - Data Guard API (SaaS): [`api/saas/data_guard.md`](api/saas/data_guard.md)
    - Security Finding Converter API (SaaS): [`api/saas/security_finding_converter.md`](api/saas/security_finding_converter.md)
-   - AI Cloud Gateway (SaaS): [`api/saas/ai_cloud_gateway.md`](api/saas/ai_cloud_gateway.md)
+   - AI Cloud Gateway (SaaS): [`api/saas/ai_cloud_gateway/getting-started.md`](api/saas/ai_cloud_gateway/getting-started.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
    - ArgoCD AMI: [`ami/argocd/getting-started.md`](ami/argocd/getting-started.md)
 3. Follow that guide for deployment and configuration.
