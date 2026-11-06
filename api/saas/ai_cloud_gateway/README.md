@@ -45,4 +45,4 @@ security and compliance reviews.
 
 ## Support
 
-**contact@infoinlet.com** - we reply within one business day, Monday to Friday.
+**contact@aicloudgateway.com** - we reply within one business day, Monday to Friday.
