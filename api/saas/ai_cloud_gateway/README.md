@@ -32,7 +32,7 @@ and how to reach support.
 per subscription or API key, and an Amazon Bedrock Guardrail on every request.
 
 **[Your AWS account](aws-account.md)** - What the CloudFormation role can and
-cannot do, enabling more Bedrock models, updating the stack, and disconnecting.
+cannot do, enabling more Bedrock models, and disconnecting.
 
 **[API reference](api-reference.md)** - Request fields, responses, headers,
 limits, key rotation and every error code.

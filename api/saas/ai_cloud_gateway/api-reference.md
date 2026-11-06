@@ -132,7 +132,7 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 403 | `bedrock_access_denied` | The role was deleted or changed, or the region does not offer the models |
 | 403 | `model_not_permitted` | The pinned model is not allowed for your account |
 | 403 | `budget_exceeded` | A monthly [budget](controls.md#budgets) is reached. Raise it, or wait for the reset the message names. Not retried by SDKs |
-| 403 | `bedrock_guardrail_denied` | Your role may not apply the guardrail. [Update your stack](aws-account.md#update-your-stack) or remove the guardrail |
+| 403 | `bedrock_guardrail_denied` | Your role may not apply the guardrail. Relaunch the stack from **AWS account**, or remove the guardrail |
 | 404 | `model_not_found` | Use an id from `GET /models` |
 | 429 | `bedrock_throttled` | Retry with backoff, or raise your Bedrock quotas |
 | 500 | `internal_error` | Retry. Contact support if it persists |

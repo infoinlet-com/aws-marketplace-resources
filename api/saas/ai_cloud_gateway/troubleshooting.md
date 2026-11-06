@@ -28,7 +28,7 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | `401 api_key_required` | Send `Authorization: Bearer acg_...` |
 | `401 invalid_api_key` | The key is wrong or revoked. Create a new one on **API keys** |
 | `403 bedrock_not_connected` | [Connect your AWS account](getting-started.md#3-connect-your-aws-account) |
-| `403 bedrock_access_denied` | The `AICloudGatewayRouter` stack was deleted or changed. Relaunch it from the dashboard |
+| `403 bedrock_access_denied` | The AI Cloud Gateway stack (role `AICloudGatewayRouter-...`) was deleted or changed. Relaunch it from the dashboard |
 | `429 bedrock_throttled` | Your Bedrock quotas are used up on every model. Retry with backoff, or raise them in AWS Service Quotas |
 | Times out before any output | Use `stream: true` for long answers |
 | `500` or `502` | Retry. If it persists, contact support |
@@ -50,7 +50,7 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | `403 budget_exceeded` | A monthly limit on the subscription or the key is reached; the message says which. Raise or remove it on **Subscriptions** or **API keys**, or wait for 00:00 UTC on the 1st. [Budgets](controls.md#budgets) |
 | Spend went past the budget | Expected: the request that reaches the limit completes, and so do requests already in flight |
 | Estimated spend differs from the AWS bill | Expected: the estimate uses on-demand list prices. Your AWS bill is the final figure |
-| `403 bedrock_guardrail_denied` | Your stack predates guardrail support. [Update it](aws-account.md#update-your-stack), or choose **Remove guardrail** on **AWS account** |
+| `403 bedrock_guardrail_denied` | Your role may not apply the guardrail. Relaunch the stack from **AWS account**, or choose **Remove guardrail** there |
 | `400 bedrock_guardrail_invalid` | No guardrail with that id and version in the connected region. Check them on **AWS account**, or remove the guardrail |
 | `finish_reason` is `content_filter` | Your guardrail, or the model's own filter, blocked the prompt or the answer. Review the guardrail's policies in the Amazon Bedrock console |
 | "The guardrail wasn't saved" | See [the check messages](controls.md#turn-on-a-guardrail) |
