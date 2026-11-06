@@ -43,6 +43,18 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | Turns of one conversation answered by different models | Expected with `auto`. Pin a model to keep one |
 | A tag had no effect (`x-acg-directives` missing) | Check the [tag rules](routing.md#tags) |
 
+## Budgets and guardrails
+
+| Problem | Fix |
+|---|---|
+| `403 budget_exceeded` | A monthly limit on the subscription or the key is reached; the message says which. Raise or remove it on **Subscriptions** or **API keys**, or wait for 00:00 UTC on the 1st. [Budgets](controls.md#budgets) |
+| Spend went past the budget | Expected: the request that reaches the limit completes, and so do requests already in flight |
+| Estimated spend differs from the AWS bill | Expected: the estimate uses on-demand list prices. Your AWS bill is the final figure |
+| `403 bedrock_guardrail_denied` | Your stack predates guardrail support. [Update it](aws-account.md#update-your-stack), or choose **Remove guardrail** on **AWS account** |
+| `400 bedrock_guardrail_invalid` | No guardrail with that id and version in the connected region. Check them on **AWS account**, or remove the guardrail |
+| `finish_reason` is `content_filter` | Your guardrail, or the model's own filter, blocked the prompt or the answer. Review the guardrail's policies in the Amazon Bedrock console |
+| "The guardrail wasn't saved" | See [the check messages](controls.md#turn-on-a-guardrail) |
+
 ## Contact support
 
 Email **contact@infoinlet.com** with your AWS account ID and, for a specific

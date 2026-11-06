@@ -71,3 +71,5 @@ Anything else: [Troubleshooting](troubleshooting.md).
 
 - [Examples](examples.md) - your language or framework, streaming, tools, JSON.
 - [How routing works](routing.md) - choosing between cost and quality.
+- [Budgets and guardrails](controls.md) - optional: cap monthly spend or
+  requests, and apply an Amazon Bedrock Guardrail.

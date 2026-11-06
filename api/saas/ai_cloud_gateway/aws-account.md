@@ -15,11 +15,32 @@ only with the External ID unique to your subscription. It can:
 - invoke Bedrock models and inference profiles (`bedrock:InvokeModel`,
   `bedrock:InvokeModelWithResponseStream`);
 - list and describe them, read-only, so the dashboard can show which models you
-  have enabled.
+  have enabled;
+- apply and read Amazon Bedrock Guardrails in your account
+  (`bedrock:ApplyGuardrail`, `bedrock:GetGuardrail`). These are used only if you
+  [turn a guardrail on](controls.md#guardrails).
 
 It cannot read or change anything else in your account, and has no AWS
 Marketplace permissions, so it can never accept a model provider's terms for
 you. Sessions last at most one hour.
+
+Stacks created before guardrail support do not have the guardrail permissions.
+They keep working; update the stack only if you want a guardrail.
+
+## Update your stack
+
+To move an existing stack to the latest template:
+
+1. On the dashboard's **AWS account** page, in **Bedrock Guardrail**, copy the
+   **Template URL**.
+2. In the CloudFormation console, in the region where you created the stack,
+   select the AI Cloud Gateway stack and choose **Update**.
+3. Choose **Replace existing template**, paste the URL as the Amazon S3 URL,
+   and keep every parameter as it is.
+4. Acknowledge the IAM role and submit. Wait for `UPDATE_COMPLETE`.
+
+The role ARN and External ID do not change, so nothing needs updating in the
+dashboard.
 
 ## Enable more models
 

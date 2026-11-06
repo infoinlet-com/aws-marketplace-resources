@@ -29,10 +29,33 @@ Every plan routes the same way and covers one connected AWS account.
 - The allowance resets at 00:00 UTC on the first of each month. Unused requests
   do not carry over.
 - **Only answered requests count.** Refused calls (`400`, `401`, `403`, `404`,
-  or every model failing) and `GET /models` are free.
+  or every model failing), including calls refused by a budget, and
+  `GET /models` are free.
+- A response your guardrail blocked (`finish_reason` `content_filter`) is an
+  answered request, and counts.
 - The dashboard's **Usage** page shows this month's allowance used and anything
   beyond it. Charges appear in the AWS Billing console of the subscribing
   account.
+
+## Budgets and the allowance
+
+They are different things:
+
+- **The allowance** is how many routed requests your plan includes each month.
+  Going past it does not stop anything; the extra requests are billed per
+  1,000.
+- **A [budget](controls.md#budgets)** is an optional limit you set. Once it is
+  reached, requests are refused until the next month. It changes nothing in
+  your plan or your allowance.
+
+To keep routing charges close to your plan's fee, set a monthly request limit
+on the subscription equal to your allowance. Requests already in flight when it
+is reached can still go a little past it.
+
+## Guardrails
+
+If you [turn on a guardrail](controls.md#guardrails), AWS bills its usage to
+your AWS account, like Bedrock tokens. AI Cloud Gateway adds no charge for it.
 
 ## Change or cancel
 

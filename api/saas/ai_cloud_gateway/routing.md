@@ -16,6 +16,22 @@ images) and picks from the models enabled in your AWS account. The same request
 always gets the same choice. The response's `model` field and
 [headers](api-reference.md#response-headers) say which model answered.
 
+## Deterministic and explainable
+
+The choice is made by a rules engine, not by another language model:
+
+- **The same request, mode and catalog version always choose the same model.**
+  A choice changes only when your request or settings change, or when we
+  publish a new model catalog or update the routing rules.
+- **It takes milliseconds** and makes no extra model call, so routing adds no
+  tokens to your Bedrock bill.
+- **You can audit each decision** from the response headers: `x-acg-model` (the
+  model that answered), `x-acg-strategy` (`routed` or `pinned`), `x-acg-mode`
+  and `x-acg-catalog-version`.
+
+If [fallback](#fallback) moves a request, `x-acg-model` names the model that
+answered, not the first choice.
+
 ## Fallback
 
 If the chosen model is throttled or unavailable, the gateway moves to the next

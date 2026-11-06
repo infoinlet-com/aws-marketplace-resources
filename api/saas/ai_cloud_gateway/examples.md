@@ -5,10 +5,10 @@
 Each example assumes you finished [Getting started](getting-started.md) and
 have your key in `ACG_API_KEY`.
 
-[Clients](#clients) · [Modes](#choose-how-the-model-is-picked) ·
-[Which model answered](#see-which-model-answered) · [Streaming](#stream-the-answer) ·
-[Tools](#call-tools) · [JSON](#get-json-back) · [Images](#send-an-image) ·
-[Tags](#steer-routing-with-tags) · [Errors](#handle-errors) ·
+[Clients](#clients) | [Modes](#choose-how-the-model-is-picked) |
+[Which model answered](#see-which-model-answered) | [Streaming](#stream-the-answer) |
+[Tools](#call-tools) | [JSON](#get-json-back) | [Images](#send-an-image) |
+[Tags](#steer-routing-with-tags) | [Errors](#handle-errors) |
 [AgentCore agent](#use-it-from-an-agent-on-amazon-bedrock-agentcore)
 
 ---
@@ -283,6 +283,8 @@ except openai.APIStatusError as e:
         print("Connect your AWS account in the dashboard.")
     elif e.code == "bedrock_throttled":
         print("Bedrock is throttling every model; retry with backoff.")
+    elif e.code == "budget_exceeded":
+        print("A monthly budget is reached; do not retry until it resets.")
     else:
         print(e.status_code, e.code, e.message)
 ```

@@ -11,6 +11,12 @@
   metadata (such as task type, difficulty score and the model chosen). It holds
   no prompt or response text, and powers the **Usage** page, billing and routing
   improvements.
+- **Budgets:** month-to-date counters per subscription and per API key:
+  requests, tokens and estimated cost. They hold no prompt or response text,
+  and are deleted about 40 days after the month ends.
+- **Guardrails:** the gateway sends your guardrail's id and version with each
+  request and does not ask Bedrock for the guardrail trace, so the matched
+  text is neither returned nor stored.
 - **Credentials:** API keys are stored only as a hash. The gateway holds no
   long-lived credential for your account; it uses temporary credentials for
   your role, which require your External ID.
