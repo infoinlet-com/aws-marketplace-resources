@@ -74,9 +74,10 @@ model the gateway picks.
    [Amazon Bedrock console](https://console.aws.amazon.com/bedrock/home#/guardrails),
    in the region you connected: choose the filters, denied topics or sensitive
    information it should block, then **publish a version**. AWS's guide:
-   [Create a guardrail](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-create.html).
-   The dashboard's **Bedrock Guardrail** section links to the same console page.
-2. On **AWS account**, in **Bedrock Guardrail**, choose **Add a guardrail**.
+   [Create your guardrail](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-components.html).
+   Guardrails with cross-Region inference (required by the Standard tier) work
+   too. The dashboard's **Bedrock Guardrail** section links to the same pages.
+2. On **AWS account**, open **Bedrock Guardrail** and choose **Add a guardrail**.
    Enter the **Guardrail ID or ARN** and the **Version** (default `1`), and
    choose **Check and save**.
 
@@ -85,7 +86,7 @@ check fails, nothing changes and your connection keeps working:
 
 | Message | Fix |
 |---|---|
-| "Your AI Cloud Gateway CloudFormation stack is older than guardrail support" | Relaunch the stack from the **AWS account** page, test the new role, then save again |
+| "Your AI Cloud Gateway role may not read this guardrail" | Relaunch the stack from the **AWS account** page, test the new role, then save again |
 | "There is no guardrail ... with version ... in ..." | Check the id, version and region in the Amazon Bedrock console |
 | "This guardrail is in ... of account ..." | Use a guardrail in the connected account and region |
 | "This guardrail's status is ..." | Fix it in the Amazon Bedrock console, or choose another version |
