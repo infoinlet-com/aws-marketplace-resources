@@ -12,7 +12,9 @@
 | a model id, e.g. `anthropic.claude-sonnet-5-5` | One fixed model, e.g. for a whole conversation. `GET /models` lists ids |
 
 With `auto`, the gateway reads the request (task, difficulty, length, tools,
-images) and picks from the models enabled in your AWS account. The same request
+images, and your `max_tokens`) and picks from the models enabled in your AWS
+account. A model that reasons before answering needs room for it within
+`max_tokens`; [a small cap changes the choice](api-reference.md#output-cap-and-reasoning). The same request
 always gets the same choice. The response's `model` field and
 [headers](api-reference.md#response-headers) say which model answered.
 
@@ -57,7 +59,8 @@ Rules:
   `task: complex`). Tags inside code blocks are ignored.
 - A tag in the user message wins over one in the system prompt.
 - Pinned models ignore tags.
-- With `effort:high`, use `stream: true` to avoid the 60-second timeout.
+- With `effort:high`, an answer can take minutes. Use `stream: true` to show
+  output as it arrives.
 - If your end users write prompts, they can write tags too, and move requests to
   more expensive models.
 

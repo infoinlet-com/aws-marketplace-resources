@@ -30,7 +30,7 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | `403 bedrock_not_connected` | [Connect your AWS account](getting-started.md#3-connect-your-aws-account) |
 | `403 bedrock_access_denied` | The AI Cloud Gateway stack (role `AICloudGatewayRouter-...`) was deleted or changed. Relaunch it from the dashboard |
 | `429 bedrock_throttled` | Your Bedrock quotas are used up on every model. Retry with backoff, or raise them in AWS Service Quotas |
-| Times out before any output | Use `stream: true` for long answers |
+| Your client times out on a long answer | The gateway keeps the connection open, but your HTTP client may give up sooner. Raise its timeout, or use `stream: true` |
 | `500` or `502` | Retry. If it persists, contact support |
 
 ## Models and routing
@@ -42,6 +42,9 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | `400 no_eligible_model` | The input is too long, or needs images or tools no enabled model has. Trim it, or enable more models |
 | Turns of one conversation answered by different models | Expected with `auto`. Pin a model to keep one |
 | A tag had no effect (`x-acg-directives` missing) | Check the [tag rules](routing.md#tags) |
+| `content` is empty or cut short, `finish_reason` is `length` | `max_tokens` is too small: hidden reasoning counts against it. Raise it to 8,000 or more for hard prompts, or leave it out. [Output cap and reasoning](api-reference.md#output-cap-and-reasoning) |
+| `x-acg-warning: max_tokens_limits_thinking` | Your `max_tokens` made the gateway switch reasoning off, lower it, or skip a model that reasons. Raise it for full-strength answers |
+| A different model answers when you lower `max_tokens` | Expected with `auto`: models that cannot stop reasoning are skipped when the cap leaves no room for it |
 
 ## Budgets and guardrails
 

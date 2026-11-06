@@ -3,6 +3,7 @@
 [AI Cloud Gateway](README.md) > API reference
 
 [Authentication](#authentication) | [POST /chat/completions](#post-chatcompletions) |
+[Output cap and reasoning](#output-cap-and-reasoning) |
 [GET /models](#get-models) | [Response headers](#response-headers) |
 [Limits](#limits) | [Errors](#errors)
 
@@ -27,9 +28,9 @@ one. A revoked key stops working within 60 seconds.
 |---|---|---|
 | `model` | string | `auto` (default), `auto:cost`, `auto:quality`, or a model id. See [routing](routing.md) |
 | `messages` | object[] | Required. Roles: `system`, `developer`, `user`, `assistant`, `tool` |
-| `max_tokens` / `max_completion_tokens` | integer | Output cap |
-| `temperature` | number | 0 to 2. Ignored while the model reasons (`effort:` tags) |
-| `top_p` | number | 0 to 1. Ignored while the model reasons |
+| `max_tokens` / `max_completion_tokens` | integer | Output cap. Includes hidden reasoning: see [output cap and reasoning](#output-cap-and-reasoning) |
+| `temperature` | number | 0 to 2. Ignored while the model reasons (`effort:` tags), and by Claude 5.5 models, which accept only their default |
+| `top_p` | number | 0 to 1. Ignored while the model reasons, and by Claude 5.5 models |
 | `stop` | string or string[] | Stop sequences |
 | `stream` | boolean | Server-sent events |
 | `stream_options.include_usage` | boolean | Adds a final chunk with token usage |
@@ -71,6 +72,38 @@ fetched.
 If Bedrock fails mid-stream, one event carries the [error](#errors), then
 `[DONE]`.
 
+**Non-streaming** answers can start with whitespace: the gateway sends a space
+every 10 seconds while the model works, so the connection stays open. JSON
+parsers, including the OpenAI SDKs, ignore it. If the model fails after that,
+the status is still `200` and the body is the [error](#errors).
+
+## Output cap and reasoning
+
+Claude Haiku, Sonnet and Opus 5.5 and gpt-oss-120b reason before they answer,
+even without an `effort:` tag. The reasoning is not returned, but it counts
+against `max_tokens` and is billed as output tokens (`usage.completion_tokens`
+includes it). A hard prompt can use several thousand tokens of reasoning, and
+under a small cap a model could spend the whole cap reasoning and return empty
+`content` with `finish_reason: length`.
+
+So when your `max_tokens` leaves too little room for the reasoning a request is
+expected to need:
+
+- With `auto`, models that cannot stop reasoning (Claude Opus 5.5,
+  gpt-oss-120b) are skipped for one that can answer within the cap.
+- Claude Haiku 5.5 and Sonnet 5.5 answer without reasoning
+  (`x-acg-effort: none`). The answer comes first, but it is weaker on hard
+  problems.
+- A model you pinned that cannot stop reasoning reasons at low effort
+  (`x-acg-effort: low`), and can still use up the cap.
+- The response carries `x-acg-warning: max_tokens_limits_thinking`.
+
+The gateway never raises your cap: it is your cost limit. For hard prompts, set
+`max_tokens` to 8,000 or more, or leave it out (the model's own limit applies).
+Easy prompts need little reasoning, so a small cap rarely changes them. With an
+`effort:` tag, the cap applies to the answer, and the gateway adds room for the
+reasoning that effort asks for.
+
 ## GET /models
 
 Lists the routing modes and every model id available in your connected region.
@@ -89,15 +122,15 @@ curl https://api.aicloudgateway.com/v1/models -H "Authorization: Bearer $ACG_API
 | `x-acg-mode` | `cost`, `balanced` or `quality` |
 | `x-acg-catalog-version` | Model catalog version used for the choice |
 | `x-acg-directives` | Tags applied, if any |
-| `x-acg-effort` | Reasoning effort applied, if any |
+| `x-acg-effort` | Reasoning effort applied, if any: `low`, `medium`, `high`, or `none` when reasoning was switched off to fit `max_tokens` |
+| `x-acg-warning` | `max_tokens_limits_thinking`: your `max_tokens` left too little room for reasoning. [Details](#output-cap-and-reasoning) |
 
 ## Limits
 
 | Limit | Value |
 |---|---|
-| Time to first byte, and between bytes | 60 seconds. Stream long answers |
-| Longest streaming request | 15 minutes |
-| Non-streaming request with reasoning | Output up to 21,333 tokens; stream for more |
+| Time between bytes | 60 seconds. Non-streaming answers send a space every 10 seconds while the model works, so they do not reach it |
+| Longest request | 15 minutes |
 | Key and subscription changes | Apply within 60 seconds |
 | Budget and guardrail changes | Apply within about a minute |
 | Regions | `us-east-1`, `us-east-2`, `us-west-2` |
