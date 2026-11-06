@@ -13,11 +13,10 @@ You pay for two things, both through AWS:
 
 Monthly or annual. Prices are on the listing's pricing tab.
 
-<!-- TO CONFIRM before publishing: allowances = AWS_MARKETPLACE_PLANS in aicloudgateway-webapp (docs/release/listing.md, "Plans"). -->
 | Plan | Routed requests included per month | Support |
 |---|---|---|
-| Starter | 25,000 | Email, next business day |
-| Team | 500,000 | Faster email response |
+| Starter | 50,000 | Email, next business day |
+| Team | 1,000,000 | Faster email response |
 | Business | 5,000,000 | Priority |
 
 Every plan routes the same way and covers one connected AWS account.
