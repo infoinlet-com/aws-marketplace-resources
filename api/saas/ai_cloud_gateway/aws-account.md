@@ -9,13 +9,16 @@ subscription connects one AWS account.
 
 ## What the stack creates
 
-One IAM role, `AICloudGatewayRouter`. Only AI Cloud Gateway can assume it, and
+One IAM role, named `AICloudGatewayRouter-` followed by a short suffix. Only AI Cloud Gateway can assume it, and
 only with the External ID unique to your subscription. It can:
 
 - invoke Bedrock models and inference profiles (`bedrock:InvokeModel`,
   `bedrock:InvokeModelWithResponseStream`);
 - list and describe them, read-only, so the dashboard can show which models you
-  have enabled.
+  have enabled;
+- apply and read Amazon Bedrock Guardrails in your account
+  (`bedrock:ApplyGuardrail`, `bedrock:GetGuardrail`). These are used only if you
+  [turn a guardrail on](controls.md#guardrails).
 
 It cannot read or change anything else in your account, and has no AWS
 Marketplace permissions, so it can never accept a model provider's terms for

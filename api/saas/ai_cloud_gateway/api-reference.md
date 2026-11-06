@@ -2,9 +2,9 @@
 
 [AI Cloud Gateway](README.md) > API reference
 
-[Authentication](#authentication) · [POST /chat/completions](#post-chatcompletions)
-· [GET /models](#get-models) · [Response headers](#response-headers) ·
-[Limits](#limits) · [Errors](#errors)
+[Authentication](#authentication) | [POST /chat/completions](#post-chatcompletions) |
+[GET /models](#get-models) | [Response headers](#response-headers) |
+[Limits](#limits) | [Errors](#errors)
 
 Base URL: `https://api.aicloudgateway.com/v1`. The API follows the OpenAI Chat
 Completions format; fields that do not apply are ignored, not rejected.
@@ -63,6 +63,10 @@ fetched.
 `model` is the model that answered. `finish_reason` is `stop`, `length`,
 `tool_calls` or `content_filter`. Tool calls are in `message.tool_calls`.
 
+`content_filter` means the model's own content filter or your
+[guardrail](controls.md#guardrails) stopped the answer. The status is still
+`200`. When a guardrail blocks, `content` holds its blocked message.
+
 **Streaming** returns `chat.completion.chunk` events ending with `data: [DONE]`.
 If Bedrock fails mid-stream, one event carries the [error](#errors), then
 `[DONE]`.
@@ -95,6 +99,7 @@ curl https://api.aicloudgateway.com/v1/models -H "Authorization: Bearer $ACG_API
 | Longest streaming request | 15 minutes |
 | Non-streaming request with reasoning | Output up to 21,333 tokens; stream for more |
 | Key and subscription changes | Apply within 60 seconds |
+| Budget and guardrail changes | Apply within about a minute |
 | Regions | `us-east-1`, `us-east-2`, `us-west-2` |
 
 ## Errors
@@ -118,6 +123,7 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 400 | `missing_tool_call_id` | Add `tool_call_id` to each `tool` message |
 | 400 | `no_eligible_model` | Input too long, or needs images or tools no enabled model has. Trim it or enable more models |
 | 400 | `bedrock_validation_error` | Bedrock rejected the request; the message says why |
+| 400 | `bedrock_guardrail_invalid` | Bedrock cannot use the guardrail's id or version. [Fix or remove it](troubleshooting.md#budgets-and-guardrails) |
 | 401 | `api_key_required` | Send `Authorization: Bearer acg_...` |
 | 401 | `invalid_api_key` | Key wrong or revoked. Create a new one |
 | 403 | `subscription_inactive` | Subscription pending, cancelled or expired. Check **Subscriptions** |
@@ -125,6 +131,8 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 403 | `bedrock_model_not_enabled` | [Enable the named models](aws-account.md#enable-more-models) |
 | 403 | `bedrock_access_denied` | The role was deleted or changed, or the region does not offer the models |
 | 403 | `model_not_permitted` | The pinned model is not allowed for your account |
+| 403 | `budget_exceeded` | A monthly [budget](controls.md#budgets) is reached. Raise it, or wait for the reset the message names. Not retried by SDKs |
+| 403 | `bedrock_guardrail_denied` | Your role may not apply the guardrail. Relaunch the stack from **AWS account**, or remove the guardrail |
 | 404 | `model_not_found` | Use an id from `GET /models` |
 | 429 | `bedrock_throttled` | Retry with backoff, or raise your Bedrock quotas |
 | 500 | `internal_error` | Retry. Contact support if it persists |

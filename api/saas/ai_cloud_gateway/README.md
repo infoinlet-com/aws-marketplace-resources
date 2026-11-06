@@ -5,6 +5,9 @@ Bedrock model expected to answer it well, and runs **in your own AWS account**:
 AWS bills Bedrock usage to you at your prices, and AI Cloud Gateway bills only
 for routing.
 
+The choice is **deterministic**: a rules engine, not another model, picks in
+milliseconds, and the same request always gets the same model.
+
 It speaks the OpenAI Chat Completions format, so your existing SDK or agent
 framework works by changing two settings:
 
@@ -24,6 +27,9 @@ and how to reach support.
 
 **[How routing works](routing.md)** - How a model is chosen, when to use
 `auto:cost` or `auto:quality` or pin a model, and tags that steer the choice.
+
+**[Budgets and guardrails](controls.md)** - Monthly limits on spend or requests,
+per subscription or API key, and an Amazon Bedrock Guardrail on every request.
 
 **[Your AWS account](aws-account.md)** - What the CloudFormation role can and
 cannot do, enabling more Bedrock models, and disconnecting.
