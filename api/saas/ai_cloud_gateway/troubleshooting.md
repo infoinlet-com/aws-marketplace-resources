@@ -57,6 +57,6 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 
 ## Contact support
 
-Email **contact@infoinlet.com** with your AWS account ID and, for a specific
+Email **contact@aicloudgateway.com** with your AWS account ID and, for a specific
 call, its `x-request-id` header (or the error code and time). Never send your
 API key.
