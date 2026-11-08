@@ -27,7 +27,10 @@ aws-marketplace-resources/
 │       │   ├── examples.md
 │       │   ├── troubleshooting.md
 │       │   └── ...                       # Routing, AWS account, API reference, billing, data
-│       ├── data_guard.md                 # Usage guide
+│       ├── data_guard/                   # Guide set: start at README.md
+│       │   ├── README.md                 # Index: what each page is for
+│       │   ├── getting-started.md        # Subscribe to first call
+│       │   └── ...                       # Examples, AI agents, policies, API reference, billing
 │       └── security_finding_converter.md # Usage guide
 ├── ami/                                  # AMI-based Marketplace products
 │   ├── argocd/                           # ArgoCD for Kubernetes Deployment
@@ -42,7 +45,7 @@ aws-marketplace-resources/
 └── mcp/                                  # MCP server Marketplace products
     └── container/                        # Container delivery on Bedrock AgentCore Runtime
         ├── universal_data_format_converter.md   # Usage guide
-        ├── data_guard.md                        # Usage guide
+        ├── data_guard/                          # Guide set: start at README.md
         └── security_finding_converter.md        # Usage guide
 ```
 
@@ -54,7 +57,7 @@ aws-marketplace-resources/
 
 | Product | Description | Resources |
 |---|---|---|
-| Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Works directly or through an AgentCore Gateway. | [Usage guide](api/saas/data_guard.md) |
+| Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Includes a hosted MCP server, and works through an AgentCore Gateway. | [Getting started](api/saas/data_guard/getting-started.md) · [All docs](api/saas/data_guard/README.md) |
 | Security Finding Converter API | HTTPS API that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](api/saas/security_finding_converter.md) |
 | AI Cloud Gateway | HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. | [Getting started](api/saas/ai_cloud_gateway/getting-started.md) · [All docs](api/saas/ai_cloud_gateway/README.md) |
 
@@ -63,7 +66,7 @@ aws-marketplace-resources/
 | Product | Description | Resources |
 |---|---|---|
 | Universal Data Format Converter | MCP server that converts and inspects CSV, TSV, JSON, NDJSON, YAML, XML, Excel, Parquet, and Avro, with format auto-detection and schema inference. | [Usage guide](mcp/container/universal_data_format_converter.md) |
-| Data Guard | MCP server that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. | [Usage guide](mcp/container/data_guard.md) |
+| Data Guard | MCP server that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. | [Getting started](mcp/container/data_guard/getting-started.md) · [All docs](mcp/container/data_guard/README.md) |
 | Security Finding Converter | MCP server that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](mcp/container/security_finding_converter.md) |
 
 ### AMI products (Amazon EC2)
@@ -95,9 +98,9 @@ aws-marketplace-resources/
    ```
 2. Open the guide for your product:
    - Universal Data Format Converter (AgentCore): [`mcp/container/universal_data_format_converter.md`](mcp/container/universal_data_format_converter.md)
-   - Data Guard (AgentCore): [`mcp/container/data_guard.md`](mcp/container/data_guard.md)
+   - Data Guard (AgentCore): [`mcp/container/data_guard/getting-started.md`](mcp/container/data_guard/getting-started.md)
    - Security Finding Converter (AgentCore): [`mcp/container/security_finding_converter.md`](mcp/container/security_finding_converter.md)
-   - Data Guard API (SaaS): [`api/saas/data_guard.md`](api/saas/data_guard.md)
+   - Data Guard API (SaaS): [`api/saas/data_guard/getting-started.md`](api/saas/data_guard/getting-started.md)
    - Security Finding Converter API (SaaS): [`api/saas/security_finding_converter.md`](api/saas/security_finding_converter.md)
    - AI Cloud Gateway (SaaS): [`api/saas/ai_cloud_gateway/getting-started.md`](api/saas/ai_cloud_gateway/getting-started.md)
    - Prometheus & Grafana AMI: [`ami/prometheus-grafana/ReadMe.md`](ami/prometheus-grafana/ReadMe.md)
