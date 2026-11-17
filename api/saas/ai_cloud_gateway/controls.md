@@ -51,9 +51,14 @@ requests are accepted again:
 
 It is a `403`, not a `429`, so SDKs do not retry it.
 
-- **A budget refuses once reached; it does not cut a request off.** The request
-  that reaches the limit completes, and so do requests already in flight. Spend
-  can go slightly past the limit.
+- **A request limit is exact.** Each request takes its place under the limit
+  before it is routed, so however many run at once, no more than the limit are
+  answered. A request that gets no answer gives its place back.
+- **A spend limit can go slightly past.** A request's cost is known only after
+  it is answered, so requests already in flight when spend reaches the limit
+  complete. Nothing is cut off mid-answer.
+- **If the gateway cannot check a budget, it refuses.** The request gets
+  `503 budget_unavailable` and is not sent to any model. Retry it shortly.
 - **The month is the calendar month in UTC.** Requests are accepted again at
   00:00 UTC on the first of the next month, or within about a minute of raising
   or removing the limit.

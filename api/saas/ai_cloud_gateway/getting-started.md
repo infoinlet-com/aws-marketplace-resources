@@ -7,7 +7,8 @@ CloudFormation stack with an IAM role. Your requests run in that account.
 
 ## 1. Subscribe and claim
 
-1. On the AWS Marketplace listing, choose **View purchase options**, pick a plan
+1. On the [AWS Marketplace listing](https://aws.amazon.com/marketplace/pp/prodview-cxkieexocpjai),
+   choose **View purchase options**, pick a plan
    and term, and subscribe.
 2. Choose **Set up your account**, sign in or create an account, and **claim the
    subscription**.

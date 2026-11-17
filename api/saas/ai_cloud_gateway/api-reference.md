@@ -170,3 +170,4 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 429 | `bedrock_throttled` | Retry with backoff, or raise your Bedrock quotas |
 | 500 | `internal_error` | Retry. Contact support if it persists |
 | 502 | `bedrock_error` | Retry |
+| 503 | `budget_unavailable` | A [budget](controls.md#budgets) could not be checked; the request was not sent to any model. Retry shortly |
