@@ -11,7 +11,8 @@ You pay for two things, both through AWS:
 
 ## Plans
 
-Monthly or annual. Prices are on the listing's pricing tab.
+Monthly or annual. Prices are on the
+[listing's pricing tab](https://aws.amazon.com/marketplace/pp/prodview-cxkieexocpjai).
 
 | Plan | Routed requests included per month | Support |
 |---|---|---|

@@ -51,7 +51,8 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 | Problem | Fix |
 |---|---|
 | `403 budget_exceeded` | A monthly limit on the subscription or the key is reached; the message says which. Raise or remove it on **Subscriptions** or **API keys**, or wait for 00:00 UTC on the 1st. [Budgets](controls.md#budgets) |
-| Spend went past the budget | Expected: the request that reaches the limit completes, and so do requests already in flight |
+| Spend went past the spend budget | Expected: requests already in flight when spend reaches the limit complete. Request limits are exact |
+| `503 budget_unavailable` | The gateway could not check a budget, so it sent the request to no model. Retry shortly; contact support if it persists |
 | Estimated spend differs from the AWS bill | Expected: the estimate uses on-demand list prices. Your AWS bill is the final figure |
 | `403 bedrock_guardrail_denied` | Your role may not apply the guardrail. Relaunch the stack from **AWS account**, or choose **Remove guardrail** there |
 | `400 bedrock_guardrail_invalid` | No guardrail with that id and version in the connected region. Check them on **AWS account**, or remove the guardrail |

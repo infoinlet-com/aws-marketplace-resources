@@ -14,6 +14,8 @@ framework works by changing two settings:
 - Base URL: `https://api.aicloudgateway.com/v1`
 - API key: `acg_...` from the [dashboard](https://dashboard.aicloudgateway.com)
 
+Subscribe on [AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-cxkieexocpjai).
+
 ## Guides
 
 **[Getting started](getting-started.md)** - **Start here.** Subscribe, create a
