@@ -26,7 +26,7 @@ one. A revoked key stops working within 60 seconds.
 
 | Field | Type | Notes |
 |---|---|---|
-| `model` | string | `auto` (default), `auto:cost`, `auto:quality`, or a model id. See [routing](routing.md) |
+| `model` | string | `auto` (default), `auto:cost`, `auto:quality`, or a model id. See [routing](routing.md) and [pinning rules](models.md#pin-a-model) |
 | `messages` | object[] | Required. Roles: `system`, `developer`, `user`, `assistant`, `tool` |
 | `max_tokens` / `max_completion_tokens` | integer | Output cap. Includes hidden reasoning: see [output cap and reasoning](#output-cap-and-reasoning) |
 | `temperature` | number | 0 to 2. Ignored while the model reasons (`effort:` tags), and by Claude 5.5 models, which accept only their default |
@@ -79,8 +79,9 @@ the status is still `200` and the body is the [error](#errors).
 
 ## Output cap and reasoning
 
-Claude Haiku, Sonnet and Opus 5.5 and gpt-oss-120b reason before they answer,
-even without an `effort:` tag. The reasoning is not returned, but it counts
+Many models reason before they answer, even without an `effort:` tag. In the
+recommended set these are Claude Haiku, Sonnet and Opus 5.5 and gpt-oss-120b;
+others include Claude Fable 5.2, gpt-oss-20b and the GPT-6 models. The reasoning is not returned, but it counts
 against `max_tokens` and is billed as output tokens (`usage.completion_tokens`
 includes it). A hard prompt can use several thousand tokens of reasoning, and
 under a small cap a model could spend the whole cap reasoning and return empty
@@ -89,7 +90,7 @@ under a small cap a model could spend the whole cap reasoning and return empty
 So when your `max_tokens` leaves too little room for the reasoning a request is
 expected to need:
 
-- With `auto`, models that cannot stop reasoning (Claude Opus 5.5,
+- With `auto`, models that cannot stop reasoning (such as Claude Opus 5.5 and
   gpt-oss-120b) are skipped for one that can answer within the cap.
 - Claude Haiku 5.5 and Sonnet 5.5 answer without reasoning
   (`x-acg-effort: none`). The answer comes first, but it is weaker on hard
@@ -106,10 +107,21 @@ reasoning that effort asks for.
 
 ## GET /models
 
-Lists the routing modes and every model id available in your connected region.
+Lists the routing modes (`auto`, `auto:cost`, `auto:balanced`, `auto:quality`)
+and the model ids you can use. Before you
+[choose models](models.md#choose-models), that is every catalog model offered in
+your connected region; after, only the models you switched on. A model listed
+here may still need [access in your AWS account](aws-account.md#enable-more-models).
 
 ```bash
 curl https://api.aicloudgateway.com/v1/models -H "Authorization: Bearer $ACG_API_KEY"
+```
+
+```json
+{"object": "list", "data": [
+  {"id": "auto", "object": "model", "created": 1760400000, "owned_by": "aicloudgateway"},
+  {"id": "amazon.nova-micro", "object": "model", "created": 1760400000, "owned_by": "aicloudgateway"}
+]}
 ```
 
 ## Response headers
@@ -154,7 +166,7 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 400 | `invalid_image` | Fix the base64 image data |
 | 400 | `invalid_tool_arguments` | Send tool-call `arguments` as valid JSON |
 | 400 | `missing_tool_call_id` | Add `tool_call_id` to each `tool` message |
-| 400 | `no_eligible_model` | Input too long, or needs images or tools no enabled model has. Trim it or enable more models |
+| 400 | `no_eligible_model` | Input too long, or needs images or tools no model in routing has. Trim it, or [switch on more models](models.md#choose-models) |
 | 400 | `bedrock_validation_error` | Bedrock rejected the request; the message says why |
 | 400 | `bedrock_guardrail_invalid` | Bedrock cannot use the guardrail's id or version. [Fix or remove it](troubleshooting.md#budgets-and-guardrails) |
 | 401 | `api_key_required` | Send `Authorization: Bearer acg_...` |
@@ -163,7 +175,7 @@ OpenAI error envelope, so SDKs raise their usual exceptions. Match on `code`.
 | 403 | `bedrock_not_connected` | [Connect your AWS account](getting-started.md#3-connect-your-aws-account) |
 | 403 | `bedrock_model_not_enabled` | [Enable the named models](aws-account.md#enable-more-models) |
 | 403 | `bedrock_access_denied` | The role was deleted or changed, or the region does not offer the models |
-| 403 | `model_not_permitted` | The pinned model is not allowed for your account |
+| 403 | `model_not_permitted` | The pinned model cannot serve this request. Either you chose models and it is not one of them ([switch it on](models.md#choose-models)), or the request needs something it lacks, such as images, tools or a longer context. The message says which |
 | 403 | `budget_exceeded` | A monthly [budget](controls.md#budgets) is reached. Raise it, or wait for the reset the message names. Not retried by SDKs |
 | 403 | `bedrock_guardrail_denied` | Your role may not apply the guardrail. Relaunch the stack from **AWS account**, or remove the guardrail |
 | 404 | `model_not_found` | Use an id from `GET /models` |

@@ -14,6 +14,10 @@
 - **Budgets:** month-to-date counters per subscription and per API key:
   requests, tokens and estimated cost. They hold no prompt or response text,
   and are deleted about 40 days after the month ends.
+- **Models:** the models you chose, the catalog's model ids when you saved (to
+  mark later ones *New*), and each model's last [test](models.md#test-a-model)
+  result: pass or fail, a short message and the time. The test prompt is a fixed
+  one-line prompt, and its answer is not kept.
 - **Guardrails:** the gateway sends your guardrail's id and version with each
   request and does not ask Bedrock for the guardrail trace, so the matched
   text is neither returned nor stored.

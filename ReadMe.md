@@ -24,6 +24,7 @@ aws-marketplace-resources/
 │       ├── ai_cloud_gateway/             # Guide set: start at README.md
 │       │   ├── README.md                 # Index: what each page is for
 │       │   ├── getting-started.md        # Subscribe to first call
+│       │   ├── models.md                 # Choose and test models; the model catalog
 │       │   ├── examples.md
 │       │   ├── troubleshooting.md
 │       │   └── ...                       # Routing, AWS account, API reference, billing, data
@@ -59,7 +60,7 @@ aws-marketplace-resources/
 |---|---|---|
 | Data Guard API | HTTPS API that detects and redacts PII, PHI, financial data, and secrets across text, JSON, NDJSON, YAML, and CSV, with compliance policy packs and auditable receipts. Includes a hosted MCP server, and works through an AgentCore Gateway. | [Getting started](api/saas/data_guard/getting-started.md) · [All docs](api/saas/data_guard/README.md) |
 | Security Finding Converter API | HTTPS API that converts security findings between AWS Security Finding Format (ASFF) and OCSF in both directions, for OCSF 1.1 to 1.9, with a per-finding report of anything that does not map one-to-one. | [Usage guide](api/saas/security_finding_converter.md) |
-| AI Cloud Gateway | HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. | [Getting started](api/saas/ai_cloud_gateway/getting-started.md) · [All docs](api/saas/ai_cloud_gateway/README.md) |
+| AI Cloud Gateway | HTTPS API that routes each chat request to a suitable Amazon Bedrock model in your own AWS account, billed per routed request. You choose the models it may use, from Amazon, Anthropic, OpenAI, Meta, Mistral and other providers. | [Getting started](api/saas/ai_cloud_gateway/getting-started.md) · [All docs](api/saas/ai_cloud_gateway/README.md) |
 
 ### MCP server products (container on Amazon Bedrock AgentCore Runtime)
 
