@@ -9,11 +9,12 @@
 | `auto` (default) | Most work. The cheapest model expected to answer well |
 | `auto:cost` | High volume, simple work: classification, extraction, short replies |
 | `auto:quality` | Work where a wrong answer costs more than a stronger model |
-| a model id, e.g. `anthropic.claude-sonnet-5-5` | One fixed model, e.g. for a whole conversation. `GET /models` lists ids |
+| a model id, e.g. `anthropic.claude-sonnet-5-5` | One fixed model, e.g. for a whole conversation. `GET /models` lists ids. [Pinning rules](models.md#pin-a-model) |
 
 With `auto`, the gateway reads the request (task, difficulty, length, tools,
-images, and your `max_tokens`) and picks from the models enabled in your AWS
-account. A model that reasons before answering needs room for it within
+images, and your `max_tokens`) and picks from the models in routing: our
+recommended set until you [choose models](models.md#choose-models), then exactly
+the models you switched on that your AWS account can call. A model that reasons before answering needs room for it within
 `max_tokens`; [a small cap changes the choice](api-reference.md#output-cap-and-reasoning). The same request
 always gets the same choice. The response's `model` field and
 [headers](api-reference.md#response-headers) say which model answered.
@@ -37,8 +38,9 @@ answered, not the first choice.
 ## Fallback
 
 If the chosen model is throttled or unavailable, the gateway moves to the next
-suitable one before any output is sent. Requests Bedrock rejects as invalid are
-not retried.
+suitable one before any output is sent. Fallback stays within the models in
+routing, also for a pinned request. Requests Bedrock rejects as invalid are not
+retried.
 
 ## Tags
 

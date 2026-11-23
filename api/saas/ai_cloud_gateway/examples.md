@@ -84,7 +84,7 @@ client.chat.completions.create(model="auto:quality", ...)  # lean toward stronge
 client.chat.completions.create(model="anthropic.claude-sonnet-5-5", ...)  # pin one model
 ```
 
-List the ids you can pin:
+List the ids you can pin ([pinning rules](models.md#pin-a-model)):
 
 ```bash
 curl https://api.aicloudgateway.com/v1/models -H "Authorization: Bearer $ACG_API_KEY"

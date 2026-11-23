@@ -1,7 +1,9 @@
 # AI Cloud Gateway
 
 An LLM router for Amazon Bedrock. Each chat request goes to the lowest-cost
-Bedrock model expected to answer it well, and runs **in your own AWS account**:
+Bedrock model expected to answer it well, from models by Amazon, Anthropic,
+OpenAI, Meta, Mistral and other providers that you choose. It runs **in your own
+AWS account**:
 AWS bills Bedrock usage to you at your prices, and AI Cloud Gateway bills only
 for routing.
 
@@ -30,11 +32,14 @@ and how to reach support.
 **[How routing works](routing.md)** - How a model is chosen, when to use
 `auto:cost` or `auto:quality` or pin a model, and tags that steer the choice.
 
+**[Models](models.md)** - Tiers, the recommended set, choosing and testing
+models on the dashboard, pinning rules, and the full model catalog.
+
 **[Budgets and guardrails](controls.md)** - Monthly limits on spend or requests,
 per subscription or API key, and an Amazon Bedrock Guardrail on every request.
 
 **[Your AWS account](aws-account.md)** - What the CloudFormation role can and
-cannot do, enabling more Bedrock models, and disconnecting.
+cannot do, enabling access to more Bedrock models, and disconnecting.
 
 **[API reference](api-reference.md)** - Request fields, responses, headers,
 limits, key rotation and every error code.

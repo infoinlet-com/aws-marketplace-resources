@@ -37,9 +37,14 @@ Every error code is also listed in the [API reference](api-reference.md#errors).
 
 | Problem | Fix |
 |---|---|
-| `403 bedrock_model_not_enabled`, or Claude never answers | [Enable the models](aws-account.md#enable-more-models) the **AWS account** page lists |
+| `403 bedrock_model_not_enabled`, or Claude never answers | [Enable the models](aws-account.md#enable-more-models) the **Models** page marks *Needs access* |
+| `403 model_not_permitted` | You pinned a model outside the models you chose. Switch it on on **Models**, or pin one you chose. If the message names another reason, the model cannot serve this request (for example it takes no images) |
 | `404 model_not_found` | Use an id from `GET /models` |
-| `400 no_eligible_model` | The input is too long, or needs images or tools no enabled model has. Trim it, or enable more models |
+| `400 no_eligible_model` | The input is too long, or needs images or tools no model in routing has. Trim it, or [switch on more models](models.md#choose-models) |
+| A model never answers `auto` requests | Check its status on **Models**: it must be *In routing*. Even then, `auto` picks it only when it is the cheapest model expected to answer well |
+| A model shows *Test failed* | Hover the chip for the reason. Fix it, then choose **Test** again |
+| Saving a choice of models fails | A choice must leave at least one model your account can call. Switch on a model that is ready |
+| A new model is not used | New models arrive off. Switch it on on **Models** |
 | Turns of one conversation answered by different models | Expected with `auto`. Pin a model to keep one |
 | A tag had no effect (`x-acg-directives` missing) | Check the [tag rules](routing.md#tags) |
 | `content` is empty or cut short, `finish_reason` is `length` | `max_tokens` is too small: hidden reasoning counts against it. Raise it to 8,000 or more for hard prompts, or leave it out. [Output cap and reasoning](api-reference.md#output-cap-and-reasoning) |

@@ -14,8 +14,9 @@ only with the External ID unique to your subscription. It can:
 
 - invoke Bedrock models and inference profiles (`bedrock:InvokeModel`,
   `bedrock:InvokeModelWithResponseStream`);
-- list and describe them, read-only, so the dashboard can show which models you
-  have enabled;
+- list and describe them, read-only, and check which ones your account has
+  access to (`bedrock:GetFoundationModelAvailability`), so the dashboard can mark
+  models that need access. This spends no tokens;
 - apply and read Amazon Bedrock Guardrails in your account
   (`bedrock:ApplyGuardrail`, `bedrock:GetGuardrail`). These are used only if you
   [turn a guardrail on](controls.md#guardrails).
@@ -26,17 +27,24 @@ you. Sessions last at most one hour.
 
 ## Enable more models
 
-Amazon Nova, Meta Llama and OpenAI gpt-oss work on first use. Anthropic Claude
-models need a one-time AWS Marketplace subscription in your account:
+Many models work on first use. Others, such as Anthropic Claude and other
+models sold through AWS Marketplace, need a one-time AWS Marketplace
+subscription in your account. The dashboard's **Models** page marks them
+*Needs access* (only for models you switched on, or recommended ones if you
+have not chosen):
 
 1. Sign in as an administrator (permission for `aws-marketplace:Subscribe`).
-2. In the Bedrock console, in the connected region, open **Model catalog** and
-   enable each model the dashboard lists, or try it once in the playground.
-   AWS may ask a short use-case form for Anthropic models.
-3. After a few minutes, choose **Test again** in the dashboard.
+2. Select the *Needs access* chip, or open **Model catalog** in the Bedrock
+   console in the connected region, and enable the model, or try it once in the
+   playground. AWS may ask a short use-case form for Anthropic models.
+3. After a few minutes, choose **Test again** on **AWS account**. To check one
+   model, choose **Test** on it on **Models**.
 
 Until then, requests go to the models you already have. A request pinned to a
 model not yet enabled fails with `403 bedrock_model_not_enabled`.
+
+If **AWS account** says "Model access wasn't checked", your stack is older than
+the access check. Relaunch the stack from that page to get it.
 
 ## Quotas
 

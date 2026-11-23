@@ -34,14 +34,17 @@ store it now.
 The role can only call and list Bedrock models.
 [What it can do](aws-account.md#what-the-stack-creates).
 
-## 4. Enable models, if any are listed
+## 4. Check your models
 
-The dashboard lists models your AWS account has not enabled yet. Anthropic
-Claude models need a one-time approval by an administrator of your AWS account:
-in the Bedrock console's **Model catalog** (same region), open each listed model
-and enable it. Then choose **Test again**.
+Open **Models**. Until you choose models, routing uses our recommended set,
+marked with a star. A model marked *Needs access* is one your AWS account cannot
+call yet: Anthropic Claude and some other providers' models need a one-time
+approval by an administrator of your AWS account. Select the chip to open the
+Bedrock console (same region), enable the model, then choose **Test again** on
+**AWS account**.
 
-Optional for now: until then, requests go to the models you already have.
+Optional for now: until then, requests go to the models you already have. To
+use more models, or fewer, see [Models](models.md#choose-models).
 
 ## 5. Make your first call
 
@@ -64,7 +67,7 @@ If you get an error instead:
 | `api_key_required`, `invalid_api_key` | Step 2 |
 | `subscription_inactive` | Step 1: wait for `active` |
 | `bedrock_not_connected` | Step 3 |
-| `bedrock_model_not_enabled` | Step 4 |
+| `bedrock_model_not_enabled`, `model_not_permitted` | Step 4 |
 
 Anything else: [Troubleshooting](troubleshooting.md).
 
@@ -72,5 +75,6 @@ Anything else: [Troubleshooting](troubleshooting.md).
 
 - [Examples](examples.md) - your language or framework, streaming, tools, JSON.
 - [How routing works](routing.md) - choosing between cost and quality.
+- [Models](models.md) - choose which models your routing uses, and test them.
 - [Budgets and guardrails](controls.md) - optional: cap monthly spend or
   requests, and apply an Amazon Bedrock Guardrail.

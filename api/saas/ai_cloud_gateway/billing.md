@@ -33,6 +33,8 @@ Every plan routes the same way and covers one connected AWS account.
   `GET /models` are free.
 - A response your guardrail blocked (`finish_reason` `content_filter`) is an
   answered request, and counts.
+- A **Test** on the **Models** page is not a routed request. AWS bills its few
+  tokens to your account, like any Bedrock call.
 - The dashboard's **Usage** page shows this month's allowance used and anything
   beyond it. Charges appear in the AWS Billing console of the subscribing
   account.
