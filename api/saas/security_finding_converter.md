@@ -10,7 +10,7 @@ There is nothing to deploy: subscribe, get an API key, and call the API.
 - Base URL: `https://api.llmlinq.com/finding-converter/v1`
 - Authentication: API key, `Authorization: Bearer llq_live_...`
 - Endpoints: `POST /asff-to-ocsf`, `POST /ocsf-to-asff`, `POST /validate`, `GET /mappings`
-- OCSF versions: reads 1.0 to 1.9, writes 1.1 to 1.9
+- OCSF versions: reads 1.0 to 1.10, writes 1.1 to 1.10
 - Input: single findings, arrays, NDJSON, `{"Findings": [...]}` bodies and EventBridge Security Hub events
 
 > Want the same converter running inside your own AWS account, so findings never
@@ -65,8 +65,8 @@ with `ocsf_version`:
 | `auto` (default) | the release the finding came from, else `1.1.0` | round trips |
 | `security_hub` | `1.6.0` | the new AWS Security Hub |
 | `security_lake` | `1.1.0` | Amazon Security Lake (its AWS sources are 1.1.0; custom sources accept up to 1.3) |
-| `latest` | `1.9.0` | the newest OCSF release |
-| `1.1.0` to `1.9.0` | that release | a consumer that requires one |
+| `latest` | `1.10.0` | the newest OCSF release |
+| `1.1.0` to `1.10.0` | that release | a consumer that requires one |
 
 Only fields the chosen release defines, and has not retired, are written.
 
@@ -507,7 +507,7 @@ not guarantee that Security Hub will accept a finding.
 | "This finding names no AWS account" | The OCSF finding is about a non-AWS resource. Pass `aws_account_id`: the account it will be imported into. |
 | "ASFF needs a ProductArn ... Pass region" | The finding has no Security Hub product ARN and no AWS region. Pass `region`, or `product_arn`. |
 | "this is not an ASFF finding (it looks like OCSF)" | You called the endpoint for the other direction. Use `/ocsf-to-asff`. |
-| "ocsf_version must be one of ..." | Use a release from 1.1.0 to 1.9.0, `latest`, `security_hub`, `security_lake` or `auto`. OCSF 1.0 can be read but not written. |
+| "ocsf_version must be one of ..." | Use a release from 1.1.0 to 1.10.0, `latest`, `security_hub`, `security_lake` or `auto`. OCSF 1.0 can be read but not written. |
 | A report says `lossy` | ASFF's limits could not hold a value; `dropped` names it. Pass `strict: true` to refuse instead. |
 | `400 unsupported_parameters` with `path` | File paths are not accepted over HTTP. Send the content as `findings`, `text` or `base64_data`. |
 | `413 result_too_large` | Send fewer findings per request. |

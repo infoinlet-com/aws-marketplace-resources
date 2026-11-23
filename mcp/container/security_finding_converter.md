@@ -12,7 +12,7 @@ stored between requests.
 - Protocol: MCP over streamable HTTP (`POST /mcp`)
 - Architecture: ARM64 (AWS Graviton), stateless, listens on port `8000`
 - Tools: `convert_asff_to_ocsf`, `convert_ocsf_to_asff`, `validate_finding`, `list_mappings`
-- OCSF versions: reads 1.0 to 1.9, writes 1.1 to 1.9
+- OCSF versions: reads 1.0 to 1.10, writes 1.1 to 1.10
 - Input: single findings, arrays, NDJSON, `{"Findings": [...]}` bodies and EventBridge Security Hub events
 
 ---
@@ -74,8 +74,8 @@ project's own schema server, and uses it in both directions:
 | `auto` (default) | the release the finding came from, else `1.1.0` | round trips |
 | `security_hub` | `1.6.0` | the new AWS Security Hub |
 | `security_lake` | `1.1.0` | Amazon Security Lake (its AWS sources are 1.1.0; custom sources accept up to 1.3) |
-| `latest` | `1.9.0` | the newest OCSF release |
-| `1.1.0` to `1.9.0` | that release | a consumer that requires one |
+| `latest` | `1.10.0` | the newest OCSF release |
+| `1.1.0` to `1.10.0` | that release | a consumer that requires one |
 
 Only fields the chosen release defines, and has not retired, are written. New
 OCSF releases are added in later versions of this product.
@@ -588,7 +588,7 @@ because for this product the dangerous failure is not "the process is down" but
 "the process is up and losing fields", which a plain 200 would hide.
 
 ```json
-{"status": "ok", "roundtrip_exact": true, "version": "0.1.0"}
+{"status": "ok", "roundtrip_exact": true, "version": "0.2.0"}
 ```
 
 Any other `status`, or a 503, means conversions are not reliable. Treat it as
@@ -653,7 +653,7 @@ not guarantee that Security Hub will accept a finding.
 | "ASFF needs a ProductArn ... Pass region" | The finding has no Security Hub product ARN and no AWS region. Pass `region`, or `product_arn`. |
 | "this is not an ASFF finding (it looks like OCSF)" | You called the tool for the other direction. Use `convert_ocsf_to_asff`. |
 | "Not a valid ASFF finding" / "Not a valid OCSF finding" | The message names the field. Run `validate_finding` to see every issue at once. |
-| "ocsf_version must be one of ..." | Use a release from 1.1.0 to 1.9.0, `latest`, `security_hub`, `security_lake` or `auto`. OCSF 1.0 can be read but not written. |
+| "ocsf_version must be one of ..." | Use a release from 1.1.0 to 1.10.0, `latest`, `security_hub`, `security_lake` or `auto`. OCSF 1.0 can be read but not written. |
 | A report says `lossy` | ASFF's limits could not hold a value; `dropped` names it. Pass `strict=true` to refuse instead. |
 | Output has `path` instead of `findings` | The result was over 256 KiB and was written to the scratch directory. Send fewer findings per call to get them inline. |
 | "Input too large" | Input exceeds `SFC_MAX_INPUT_BYTES`; raise it or split the input. |
